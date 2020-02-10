@@ -1,0 +1,32 @@
+{
+    "name": "inspector-apm/inspector-symfony",
+    "description": "Real-Time monitoring for Symfony applications.",
+    "keywords": ["monitoring", "php", "inspector", "symfony"],
+    "license": "MIT",
+    "type": "symfony-bundle",
+    "authors": [
+        {
+            "name": "Valerio Barbera",
+            "email": "valerio@inspector.dev"
+        }
+    ],
+    "require": {
+		"php": "^7.0",
+		"inspector-apm/inspector-php": "^3.0"
+	},
+    "require-dev": {
+        "phpunit/phpunit": "^7.0"
+    },
+	"autoload": {
+        "psr-4": {
+            "Inspector\\Symfony\\InspectorBundle\\": "src/"
+        }
+    },
+	"autoload-dev": {
+        "psr-4": {
+            "Inspector\\Symfony\\InspectorBundle\\Tests\\": "tests/"
+        }
+    },
+	"minimum-stability": "dev",
+    "prefer-stable": true
+}
