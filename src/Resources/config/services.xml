@@ -6,7 +6,6 @@
 
     <services>
         <service class="Inspector\Inspector" id="inspector"/>
-
         <service id="Inspector\Inspector" alias="inspector"/>
     </services>
 </container>
