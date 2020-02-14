@@ -5,7 +5,7 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service class="Inspector\Inspector" id="inspector"/>
-        <service id="Inspector\Inspector" alias="inspector"/>
+        <service class="Inspector\Inspector" id="inspector" public="true"/>
+        <service id="Inspector\Inspector" alias="inspector" public="true"/>
     </services>
 </container>

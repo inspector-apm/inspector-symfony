@@ -2,6 +2,7 @@ composer.phar
 composer.lock
 composer-test.lock
 phpunit.xml
+phpunit.xml.dist
 vendor/
 build/artifacts/
 artifacts/
@@ -10,3 +11,5 @@ docs/*.pyc
 .idea
 .DS_STORE
 .phpunit.result.cache
+/tests/cache
+/tests/cache*

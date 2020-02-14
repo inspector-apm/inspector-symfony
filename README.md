@@ -9,7 +9,7 @@
 
 ## Requirements
 
-- PHP >= 7.0.0
+- PHP >= 7.1.3
 - Symfony >= 5
 
 <a name="install"></a>
@@ -26,13 +26,14 @@ composer require inspector-apm/inspector-symfony
 
 ### Configure the API Key
 
-First put the Inspector API KEY in your environment file:
+Create the `inspector.yaml` configuration file in your `config/packages` directory, and put the `api_key` field inside:
 
-```
-INSPECTOR_API_KEY=[api key]
+```yaml
+inspector:
+    api_key: [your-application-api-key]
 ```
 
-You can obtain `INSPECTOR_API_KEY` creating a new project in your [Inspector](https://www.inspector.dev) dashboard.
+You can obtain the `api_key` creating a new project in your [Inspector](https://www.inspector.dev) dashboard.
 
 
 ## Official documentation

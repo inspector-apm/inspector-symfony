@@ -11,23 +11,24 @@
         }
     ],
     "require": {
-		"php": "^7.0",
+		"php": "^7.1.3",
 		"inspector-apm/inspector-php": "^3.0",
-        "symfony/http-kernel": "^5.0",
+        "symfony/config": "^5.0",
         "symfony/dependency-injection": "^5.0",
-        "symfony/config": "^5.0"
+        "symfony/http-kernel": "^5.0"
 	},
     "require-dev": {
-        "phpunit/phpunit": "^7.0"
+        "phpunit/phpunit": "^7.0",
+        "symfony/phpunit-bridge": "^5.0"
     },
 	"autoload": {
         "psr-4": {
-            "Inspector\\Symfony\\InspectorBundle\\": "src/"
+            "Inspector\\Symfony\\": "src/"
         }
     },
 	"autoload-dev": {
         "psr-4": {
-            "Inspector\\Symfony\\InspectorBundle\\Tests\\": "tests/"
+            "Inspector\\Symfony\\Tests\\": "tests/"
         }
     },
 	"minimum-stability": "dev",
