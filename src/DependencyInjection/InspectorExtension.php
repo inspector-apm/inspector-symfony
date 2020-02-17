@@ -23,8 +23,6 @@ class InspectorExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        $definition = $container->getDefinition('inspector');
-
         // Inspector configuration
         $inspectorConfigDefinition = new Definition(\Inspector\Configuration::class, [$config['api_key']]);
         $inspectorConfigDefinition->setPublic(false);
@@ -34,6 +32,7 @@ class InspectorExtension extends Extension
 
         $container->setDefinition('inspector.configuration', $inspectorConfigDefinition);
 
-        $definition->setArgument(0, $inspectorConfigDefinition);
+        $container->getDefinition('inspector')
+            ->setArgument(0, $inspectorConfigDefinition);
     }
 }
