@@ -67,9 +67,9 @@ class InspectorListener implements EventSubscriberInterface
         // where the ExceptionEvent exists and is used but doesn't implement
         // the `getThrowable` method, which was introduced in Symfony 4.4
         if ($event instanceof ExceptionEvent && method_exists($event, 'getThrowable')) {
-            $this->inspector->reportExcetion($event->getThrowable());
+            $this->notifyUnexpectedError($event->getThrowable());
         } elseif ($event instanceof GetResponseForExceptionEvent) {
-            $this->inspector->reportExcetion($event->getException());
+            $this->notifyUnexpectedError($event->getException());
         } else {
             throw new \InvalidArgumentException('Invalid exception event.');
         }
@@ -87,7 +87,7 @@ class InspectorListener implements EventSubscriberInterface
     {
         $this->startTransaction($event->getCommand()->getName());
 
-        $this->inspector->reportException($event->getException());
+        $this->notifyUnexpectedError($event->getException());
     }
 
     /**
@@ -101,7 +101,7 @@ class InspectorListener implements EventSubscriberInterface
     {
         $this->startTransaction($event->getCommand()->getName());
 
-        $this->inspector->reportException($event->getError());
+        $this->notifyUnexpectedError($event->getError());
     }
 
     /**
@@ -118,5 +118,15 @@ class InspectorListener implements EventSubscriberInterface
         }
 
         return $this->inspector->currentTransaction();
+    }
+
+    /**
+     * Report unexpected error to inspection API.
+     *
+     * @param $throwable
+     */
+    protected function notifyUnexpectedError($throwable)
+    {
+        $this->inspector->reportException($throwable, false);
     }
 }
