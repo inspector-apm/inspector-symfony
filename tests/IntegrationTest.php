@@ -11,7 +11,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 
-class FunctionalTest extends TestCase
+class IntegrationTest extends TestCase
 {
     public function testServiceWiring()
     {
@@ -81,6 +81,42 @@ class InspectorTestingKernel extends Kernel
      */
     public function getCacheDir()
     {
-        return __DIR__.'/cache_'.spl_object_hash($this);
+        $currentCache = __DIR__.'/cache_'.spl_object_hash($this);
+
+        foreach(glob(__DIR__ . "/cache_*") as $item) {
+            if (is_dir($item) && $currentCache != $item)
+                $this->deleteDirectory($item);
+        }
+
+        return $currentCache;
+    }
+
+    /**
+     * Recursive delete a directory.
+     *
+     * @param string $dir
+     * @return bool
+     */
+    protected function deleteDirectory($dir) {
+        if (!file_exists($dir)) {
+            return true;
+        }
+
+        if (!is_dir($dir)) {
+            return unlink($dir);
+        }
+
+        foreach (scandir($dir) as $item) {
+            if ($item == '.' || $item == '..') {
+                continue;
+            }
+
+            if (!$this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item)) {
+                return false;
+            }
+
+        }
+
+        return rmdir($dir);
     }
 }
