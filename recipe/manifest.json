@@ -1,6 +1,6 @@
 {
     "bundles": {
-        "Inspector\\Symfony\\Bundle": ["all"]
+        "Inspector\\Symfony\\Bundle\\InspectorBundle": ["all"]
     },
     "copy-from-recipe": {
         "config/": "%CONFIG_DIR%/"

@@ -8,7 +8,7 @@
         <service class="Inspector\Inspector" id="inspector" public="true"/>
         <service id="Inspector\Inspector" alias="inspector" public="true"/>
 
-        <service id="inspector.symfony.listener.inspector_listener" class="Inspector\Symfony\Listener\InspectorListener">
+        <service id="inspector_symfony_bundle.listeners.inspector_listener" class="Inspector\Symfony\Bundle\Listeners\InspectorListener">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber" />
         </service>
