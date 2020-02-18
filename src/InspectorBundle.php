@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Inspector\Symfony;
+namespace Inspector\Symfony\Bundle;
 
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;

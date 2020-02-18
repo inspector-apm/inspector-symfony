@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Inspector\Symfony\Listener;
+namespace Inspector\Symfony\Bundle\Listener;
 
 
 use Inspector\Inspector;

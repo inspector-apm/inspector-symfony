@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Inspector\Symfony\DependencyInjection;
+namespace Inspector\Symfony\Bundle\DependencyInjection;
 
 
 use Symfony\Component\Config\FileLocator;

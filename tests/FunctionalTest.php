@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Inspector\Symfony\Tests;
+namespace Inspector\Symfony\Bundle\Tests;
 
 
 use Inspector\Inspector;
-use Inspector\Symfony\InspectorBundle;
+use Inspector\Symfony\Bundle\InspectorBundle;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

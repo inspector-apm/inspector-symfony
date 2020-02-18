@@ -1,0 +1,2 @@
+inspector:
+    api_key: '%env(INSPECTOR_API_KEY)%'

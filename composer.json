@@ -1,7 +1,8 @@
 {
     "name": "inspector-apm/inspector-symfony",
     "description": "Real-Time monitoring for Symfony applications.",
-    "keywords": ["monitoring", "php", "inspector", "symfony"],
+    "keywords": ["monitoring", "php", "inspector", "symfony", "bundle"],
+    "homepage":    "https://www.inspector.dev",
     "license": "MIT",
     "type": "symfony-bundle",
     "authors": [
@@ -25,7 +26,7 @@
     },
 	"autoload": {
         "psr-4": {
-            "Inspector\\Symfony\\": "src/"
+            "Inspector\\Symfony\\Bundle\\": "src/"
         }
     },
 	"autoload-dev": {
