@@ -37,7 +37,7 @@ class InspectorListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         $listeners = [
-            KernelEvents::REQUEST => ['onKernelRequest', 256],
+            //KernelEvents::REQUEST => ['onKernelRequest', 256],
             KernelEvents::EXCEPTION => ['onKernelException', 128],
         ];
 
@@ -59,16 +59,20 @@ class InspectorListener implements EventSubscriberInterface
      *
      * @param GetResponseForExceptionEvent|ExceptionEvent $event
      * @return void
+     * @throws \Exception
      */
     public function onKernelException($event)
     {
+
         // Compatibility with Symfony < 5 and Symfony >=5
         // The additional `method_exists` check is to prevent errors in Symfony 4.3
         // where the ExceptionEvent exists and is used but doesn't implement
         // the `getThrowable` method, which was introduced in Symfony 4.4
         if ($event instanceof ExceptionEvent && method_exists($event, 'getThrowable')) {
+            $this->startTransaction(get_class($event->getThrowable()));
             $this->notifyUnexpectedError($event->getThrowable());
         } elseif ($event instanceof GetResponseForExceptionEvent) {
+            $this->startTransaction(get_class($event->getException()));
             $this->notifyUnexpectedError($event->getException());
         } else {
             throw new \InvalidArgumentException('Invalid exception event.');
