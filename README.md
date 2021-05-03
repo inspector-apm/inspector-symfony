@@ -1,4 +1,4 @@
-# Real-Time monitoring package for Symfony
+# Simple Code Execution monitoring for Symfony applications
 
 - [Requirements](#requirements)
 - [Install](#install)
