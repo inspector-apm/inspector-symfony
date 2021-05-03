@@ -24,13 +24,13 @@ composer require inspector-apm/inspector-symfony
 
 <a name="api-key"></a>
 
-### Configure the API Key
+### Configure the INGESTION Key
 
-Create the `inspector.yaml` configuration file in your `config/packages` directory, and put the `api_key` field inside:
+Create the `inspector.yaml` configuration file in your `config/packages` directory, and put the `ingestion_key` field inside:
 
 ```yaml
 inspector:
-    api_key: [your-application-api-key]
+    api_key: [your-ingestion-key]
 ```
 
 You can obtain the `api_key` creating a new project in your [Inspector](https://www.inspector.dev) dashboard.

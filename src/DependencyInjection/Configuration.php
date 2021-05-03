@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
         $tree->getRootNode()->children()
             ->booleanNode('enabled')->defaultTrue()->end()
             ->scalarNode('url')->defaultValue('https://ingest.inspector.dev')->end()
-            ->scalarNode('api_key')->defaultNull()->end()
+            ->scalarNode('ingestion_key')->defaultNull()->end()
             ->booleanNode('unhandled_exceptions')->defaultTrue()->end()
             ->booleanNode('query')->defaultTrue()->end()
             ->booleanNode('query_bindings')->defaultFalse()->end()

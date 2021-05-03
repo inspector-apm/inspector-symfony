@@ -1,2 +1,2 @@
 inspector:
-    api_key: '%env(INSPECTOR_API_KEY)%'
+    ingestion_key: '%env(INSPECTOR_INGESTION_KEY)%'
