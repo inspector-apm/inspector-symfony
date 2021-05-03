@@ -175,6 +175,7 @@ class InspectorListener implements EventSubscriberInterface
      * Report unexpected error to inspection API.
      *
      * @param $throwable
+     * @throws \Exception
      */
     protected function notifyUnexpectedError($throwable)
     {

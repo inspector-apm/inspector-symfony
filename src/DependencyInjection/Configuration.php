@@ -23,7 +23,7 @@ class Configuration implements ConfigurationInterface
             ->booleanNode('query')->defaultTrue()->end()
             ->booleanNode('query_bindings')->defaultFalse()->end()
             ->booleanNode('user')->defaultTrue()->end()
-            ->scalarNode('transport')->defaultValue('sync')->end()
+            ->scalarNode('transport')->defaultValue('async')->end()
             ->end();
 
         return $tree;
