@@ -24,7 +24,7 @@ class InspectorExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         // Inspector configuration
-        $inspectorConfigDefinition = new Definition(\Inspector\Configuration::class, [$config['api_key']]);
+        $inspectorConfigDefinition = new Definition(\Inspector\Configuration::class, [$config['ingestion_key']]);
         $inspectorConfigDefinition->setPublic(false);
         $inspectorConfigDefinition->addMethodCall('setEnabled', [$config['enabled']]);
         $inspectorConfigDefinition->addMethodCall('setUrl', [$config['url']]);
