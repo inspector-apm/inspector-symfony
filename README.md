@@ -2,15 +2,15 @@
 
 - [Requirements](#requirements)
 - [Install](#install)
-- [Configure the API key](#api-key)
+- [Configure the INGESTION key](#ingestion_key)
 - [See official Documentation](https://docs.inspector.dev)
 
 <a name="requirements"></a>
 
 ## Requirements
 
-- PHP >= 7.1.3
-- Symfony >= 5
+- PHP >= 7.2.5
+- Symfony >= 5.2
 
 <a name="install"></a>
 
@@ -22,7 +22,7 @@ Install the latest version of our package by:
 composer require inspector-apm/inspector-symfony
 ```
 
-<a name="api-key"></a>
+<a name="ingestion_key"></a>
 
 ### Configure the INGESTION Key
 
@@ -30,10 +30,10 @@ Create the `inspector.yaml` configuration file in your `config/packages` directo
 
 ```yaml
 inspector:
-    api_key: [your-ingestion-key]
+    ingestion_key: [your-ingestion-key]
 ```
 
-You can obtain the `api_key` creating a new project in your [Inspector](https://www.inspector.dev) dashboard.
+You can obtain the `ingestion_key` creating a new project in your [Inspector](https://www.inspector.dev) dashboard.
 
 
 ## Official documentation
