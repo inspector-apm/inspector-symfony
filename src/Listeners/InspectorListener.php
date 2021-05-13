@@ -24,7 +24,7 @@ use Throwable;
 class InspectorListener implements EventSubscriberInterface
 {
     public const SEGMENT_TYPE_PROCESS = 'process';
-    public const CONTROLLER = 'controller';
+    public const SEGMENT_CONTROLLER = 'controller';
 
     /**
      * @var Inspector
@@ -87,7 +87,8 @@ class InspectorListener implements EventSubscriberInterface
     {
         $this->endSegment(KernelEvents::CONTROLLER);
 
-        $this->startSegment(self::CONTROLLER);
+        $this->startSegment(KernelEvents::CONTROLLER_ARGUMENTS);
+        $this->startSegment(self::SEGMENT_CONTROLLER);
     }
 
 
@@ -130,17 +131,13 @@ class InspectorListener implements EventSubscriberInterface
         $this->endSegment(KernelEvents::CONTROLLER_ARGUMENTS);
         $this->endSegment(KernelEvents::REQUEST);
         $this->endSegment(KernelEvents::VIEW);
-        $this->endSegment(self::CONTROLLER);
+        $this->endSegment(self::SEGMENT_CONTROLLER);
+
         $this->startSegment(KernelEvents::RESPONSE);
     }
 
     public function onKernelFinishRequest(FinishRequestEvent $event): void
     {
-        $this->endSegment(KernelEvents::CONTROLLER);
-        $this->endSegment(KernelEvents::CONTROLLER_ARGUMENTS);
-        $this->endSegment(KernelEvents::REQUEST);
-        $this->endSegment(KernelEvents::VIEW);
-
         $this->endSegment(KernelEvents::RESPONSE);
     }
 
@@ -192,7 +189,7 @@ class InspectorListener implements EventSubscriberInterface
     {
         $this->endSegment(KernelEvents::CONTROLLER);
         $this->endSegment(KernelEvents::CONTROLLER_ARGUMENTS);
-        $this->endSegment(self::CONTROLLER);
+        $this->endSegment(self::SEGMENT_CONTROLLER);
 
         $this->startSegment(KernelEvents::VIEW);
     }
