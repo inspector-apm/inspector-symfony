@@ -55,20 +55,22 @@ class InspectorListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        $listeners = [
-            ConsoleEvents::COMMAND => ['onConsoleStart'],
+        // The higher the priority number, the earlier the method is called.
 
-            KernelEvents::CONTROLLER => ['onKernelController', -9999],
+        $listeners = [
+            ConsoleEvents::COMMAND => ['onConsoleStart', 9999],
+
+            KernelEvents::CONTROLLER => ['onKernelController', 9999],
             KernelEvents::CONTROLLER_ARGUMENTS => [
                 ['onKernelPreControllerArguments', 9999],
                 ['onKernelPostControllerArguments', -9999]
             ],
-            KernelEvents::EXCEPTION => ['onKernelException', -9999],
-            KernelEvents::FINISH_REQUEST => ['onKernelFinishRequest'],
-            KernelEvents::REQUEST => ['onKernelRequest', -9999],
-            KernelEvents::RESPONSE => ['onKernelResponse', -9999],
-            KernelEvents::VIEW => ['onKernelView', -9999],
-            KernelEvents::TERMINATE => ['onKernelTerminate'],
+            KernelEvents::EXCEPTION => ['onKernelException', 9999],
+            KernelEvents::FINISH_REQUEST => ['onKernelFinishRequest', 9999],
+            KernelEvents::REQUEST => ['onKernelRequest', 9999],
+            KernelEvents::RESPONSE => ['onKernelResponse', 9999],
+            KernelEvents::VIEW => ['onKernelView', 9999],
+            KernelEvents::TERMINATE => ['onKernelTerminate', -9999],
         ];
 
         // Added ConsoleEvents in Symfony 2.3
