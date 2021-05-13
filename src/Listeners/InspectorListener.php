@@ -43,23 +43,27 @@ class InspectorListener implements EventSubscriberInterface
      * @uses onKernelController
      * @uses onKernelException
      * @uses onKernelFinishRequest
+     * @uses onKernelPreControllerArguments
+     * @uses onKernelPostControllerArguments
      * @uses onKernelRequest
      * @uses onKernelResponse
      *
-     * @todo: add proper priorities
      */
     public static function getSubscribedEvents()
     {
         $listeners = [
             ConsoleEvents::COMMAND => ['onConsoleStart'],
 
-            KernelEvents::CONTROLLER => ['onKernelController'],
-            KernelEvents::CONTROLLER_ARGUMENTS => ['onKernelControllerArguments'],
-            KernelEvents::EXCEPTION => ['onKernelException', 128],
+            KernelEvents::CONTROLLER => ['onKernelController', -9999],
+            KernelEvents::CONTROLLER_ARGUMENTS => [
+                ['onKernelPreControllerArguments', 9999],
+                ['onKernelPostControllerArguments', -9999]
+            ],
+            KernelEvents::EXCEPTION => ['onKernelException', -9999],
             KernelEvents::FINISH_REQUEST => ['onKernelFinishRequest'],
-            KernelEvents::REQUEST => ['onKernelRequest', 256],
-            KernelEvents::RESPONSE => ['onKernelResponse'],
-            KernelEvents::VIEW => ['onKernelView'],
+            KernelEvents::REQUEST => ['onKernelRequest', -9999],
+            KernelEvents::RESPONSE => ['onKernelResponse', -9999],
+            KernelEvents::VIEW => ['onKernelView', -9999],
             KernelEvents::TERMINATE => ['onKernelTerminate'],
         ];
 
@@ -83,14 +87,19 @@ class InspectorListener implements EventSubscriberInterface
         $this->startSegment(KernelEvents::CONTROLLER);
     }
 
-    public function onKernelControllerArguments(ControllerArgumentsEvent $event): void
+    public function onKernelPreControllerArguments(ControllerArgumentsEvent $event): void
     {
         $this->endSegment(KernelEvents::CONTROLLER);
 
         $this->startSegment(KernelEvents::CONTROLLER_ARGUMENTS);
-        $this->startSegment(self::SEGMENT_CONTROLLER);
     }
 
+    public function onKernelPostControllerArguments(ControllerArgumentsEvent $event): void
+    {
+        $this->endSegment(KernelEvents::CONTROLLER_ARGUMENTS);
+
+        $this->startSegment(self::SEGMENT_CONTROLLER);
+    }
 
     /**
      * Intercept an HTTP request.
