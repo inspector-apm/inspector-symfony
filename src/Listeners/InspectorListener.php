@@ -295,6 +295,6 @@ class InspectorListener implements EventSubscriberInterface
 
         $this->segments[$label]->end();
 
-        unset($this->segments[KernelEvents::REQUEST]);
+        unset($this->segments[$label]);
     }
 }
