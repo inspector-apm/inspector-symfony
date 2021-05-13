@@ -136,11 +136,9 @@ class InspectorListener implements EventSubscriberInterface
 
         //TODO: $this->inspector->endSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::REQUEST);
         /** @var Segment $segment */
-        $this->endSegment(KernelEvents::CONTROLLER);
-        $this->endSegment(KernelEvents::CONTROLLER_ARGUMENTS);
+        $this->endSegment(self::SEGMENT_CONTROLLER);
         $this->endSegment(KernelEvents::REQUEST);
         $this->endSegment(KernelEvents::VIEW);
-        $this->endSegment(self::SEGMENT_CONTROLLER);
 
         $this->startSegment(KernelEvents::RESPONSE);
     }
@@ -196,8 +194,6 @@ class InspectorListener implements EventSubscriberInterface
 
     public function onKernelView(ViewEvent $event): void
     {
-        $this->endSegment(KernelEvents::CONTROLLER);
-        $this->endSegment(KernelEvents::CONTROLLER_ARGUMENTS);
         $this->endSegment(self::SEGMENT_CONTROLLER);
 
         $this->startSegment(KernelEvents::VIEW);
