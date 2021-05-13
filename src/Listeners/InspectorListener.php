@@ -153,7 +153,7 @@ class InspectorListener implements EventSubscriberInterface
      */
     protected function startTransaction(string $name): Transaction
     {
-        if (!$this->inspector->isRecording()) {
+        if ($this->inspector->needTransaction()) {
             $this->inspector->startTransaction($name);
         }
 
