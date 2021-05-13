@@ -6,7 +6,6 @@ namespace Inspector\Symfony\Bundle\Listeners;
 
 use Inspector\Inspector;
 use Inspector\Models\Transaction;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -16,6 +15,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
+use Throwable;
 
 class InspectorListener implements EventSubscriberInterface
 {
@@ -24,18 +24,17 @@ class InspectorListener implements EventSubscriberInterface
      */
     protected $inspector;
 
-    /**
-     * InspectorListener constructor.
-     *
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
+    public function __construct(Inspector $inspector)
     {
-        $this->inspector = $container->get('inspector');
+        $this->inspector = $inspector;
     }
 
     /**
-     * @inheritDoc
+     * @uses onKernelRequest
+     * @uses onKernelController
+     * @uses onKernelResponse
+     * @uses onKernelException
+     * @uses onConsoleStart
      */
     public static function getSubscribedEvents()
     {
@@ -62,10 +61,9 @@ class InspectorListener implements EventSubscriberInterface
     /**
      * Intercept an HTTP request.
      *
-     * @param RequestEvent $event
      * @throws \Exception
      */
-    public function onKernelRequest($event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         $this->startTransaction(
             $event->getRequest()->getMethod() . ' ' . $event->getRequest()->getUri()
@@ -74,10 +72,8 @@ class InspectorListener implements EventSubscriberInterface
 
     /**
      * Ending transaction.
-     *
-     * @param ResponseEvent $event
      */
-    public function onKernelResponse($event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$this->inspector->isRecording()) {
             return;
@@ -89,10 +85,9 @@ class InspectorListener implements EventSubscriberInterface
     /**
      * Intercept a command execution.
      *
-     * @param ConsoleCommandEvent $event
      * @throws \Exception
      */
-    public function onConsoleStart($event)
+    public function onConsoleStart(ConsoleCommandEvent $event): void
     {
         $this->startTransaction($event->getCommand()->getName());
     }
@@ -101,10 +96,10 @@ class InspectorListener implements EventSubscriberInterface
      * Handle an http kernel exception.
      *
      * @param GetResponseForExceptionEvent|ExceptionEvent $event
-     * @return void
+     *
      * @throws \Exception
      */
-    public function onKernelException($event)
+    public function onKernelException($event): void
     {
 
         // Compatibility with Symfony < 5 and Symfony >=5
@@ -121,20 +116,18 @@ class InspectorListener implements EventSubscriberInterface
             $this->startTransaction(get_class($event->getException()))->setResult('error');
             $this->notifyUnexpectedError($event->getException());
 
-        } else {
-            throw new \InvalidArgumentException('Invalid exception event.');
         }
+
+        throw new \InvalidArgumentException('Invalid exception event.');
     }
 
     /**
      * Handle a console exception (used instead of ConsoleErrorEvent before
      * Symfony 3.3 and kept for backwards compatibility).
      *
-     * @param \Symfony\Component\Console\Event\ConsoleExceptionEvent $event
-     * @return void
      * @throws \Exception
      */
-    public function onConsoleException(ConsoleExceptionEvent $event)
+    public function onConsoleException(ConsoleExceptionEvent $event): void
     {
         $this->startTransaction($event->getCommand()->getName())->setResult('error');
 
@@ -144,11 +137,9 @@ class InspectorListener implements EventSubscriberInterface
     /**
      * Handle a console error.
      *
-     * @param \Symfony\Component\Console\Event\ConsoleErrorEvent $event
-     * @return void
      * @throws \Exception
      */
-    public function onConsoleError(ConsoleErrorEvent $event)
+    public function onConsoleError(ConsoleErrorEvent $event): void
     {
         $this->startTransaction($event->getCommand()->getName())->setResult('error');
 
@@ -158,11 +149,9 @@ class InspectorListener implements EventSubscriberInterface
     /**
      * Be sure to start a transaction before report the exception.
      *
-     * @param string $name
-     * @return Transaction
      * @throws \Exception
      */
-    protected function startTransaction($name)
+    protected function startTransaction(string $name): Transaction
     {
         if (!$this->inspector->isRecording()) {
             $this->inspector->startTransaction($name);
@@ -174,10 +163,9 @@ class InspectorListener implements EventSubscriberInterface
     /**
      * Report unexpected error to inspection API.
      *
-     * @param $throwable
      * @throws \Exception
      */
-    protected function notifyUnexpectedError($throwable)
+    protected function notifyUnexpectedError(Throwable $throwable): void
     {
         $this->inspector->reportException($throwable, false);
     }
