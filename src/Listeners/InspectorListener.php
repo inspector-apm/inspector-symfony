@@ -82,6 +82,10 @@ class InspectorListener implements EventSubscriberInterface
 
     public function onKernelController(ControllerEvent $event): void
     {
+        if (!$event->isMasterRequest()){
+            return;
+        }
+
         $this->endSegment(KernelEvents::REQUEST);
 
         $this->startSegment(KernelEvents::CONTROLLER);
@@ -89,6 +93,10 @@ class InspectorListener implements EventSubscriberInterface
 
     public function onKernelPreControllerArguments(ControllerArgumentsEvent $event): void
     {
+        if (!$event->isMasterRequest()){
+            return;
+        }
+
         $this->endSegment(KernelEvents::CONTROLLER);
 
         $this->startSegment(KernelEvents::CONTROLLER_ARGUMENTS);
@@ -96,6 +104,10 @@ class InspectorListener implements EventSubscriberInterface
 
     public function onKernelPostControllerArguments(ControllerArgumentsEvent $event): void
     {
+        if (!$event->isMasterRequest()){
+            return;
+        }
+
         $this->endSegment(KernelEvents::CONTROLLER_ARGUMENTS);
 
         $this->startSegment(self::SEGMENT_CONTROLLER);
@@ -145,6 +157,10 @@ class InspectorListener implements EventSubscriberInterface
 
     public function onKernelFinishRequest(FinishRequestEvent $event): void
     {
+        if (!$event->isMasterRequest()){
+            return;
+        }
+
         $this->endSegment(KernelEvents::RESPONSE);
     }
 
@@ -189,11 +205,19 @@ class InspectorListener implements EventSubscriberInterface
 
     public function onKernelTerminate(TerminateEvent $event): void
     {
+        if (!$event->isMasterRequest()){
+            return;
+        }
+
         $this->inspector->currentTransaction()->setResult($event->getResponse()->getStatusCode());
     }
 
     public function onKernelView(ViewEvent $event): void
     {
+        if (!$event->isMasterRequest()){
+            return;
+        }
+
         $this->endSegment(self::SEGMENT_CONTROLLER);
 
         $this->startSegment(KernelEvents::VIEW);
