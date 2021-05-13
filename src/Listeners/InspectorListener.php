@@ -21,6 +21,10 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Throwable;
 
+/**
+ * @todo: exclude profiler monitoring
+ * @todo: use trait for compatibility isMaster/isMain
+ */
 class InspectorListener implements EventSubscriberInterface
 {
     public const SEGMENT_TYPE_PROCESS = 'process';
