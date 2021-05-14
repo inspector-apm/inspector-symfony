@@ -4,9 +4,6 @@ namespace Inspector\Symfony\Bundle\Listeners;
 
 use Inspector\Inspector;
 use Inspector\Models\Segment;
-use Inspector\Models\Transaction;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -17,23 +14,15 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Console\ConsoleEvents;
-use Symfony\Component\Console\Event\ConsoleErrorEvent;
-use Throwable;
 
 /**
  * @todo: exclude profiler monitoring
  * @todo: use trait for compatibility isMaster/isMain
  */
-class InspectorListener implements EventSubscriberInterface
+class KernelEventsSubscriber extends AbstractInspectorEventSubscriber
 {
     public const SEGMENT_TYPE_PROCESS = 'process';
     public const SEGMENT_CONTROLLER = 'controller';
-
-    /**
-     * @var Inspector
-     */
-    protected $inspector;
 
     protected $segments = [];
 
@@ -43,7 +32,6 @@ class InspectorListener implements EventSubscriberInterface
     }
 
     /**
-     * @uses onConsoleStart
      * @uses onKernelController
      * @uses onKernelException
      * @uses onKernelFinishRequest
@@ -51,15 +39,13 @@ class InspectorListener implements EventSubscriberInterface
      * @uses onKernelPostControllerArguments
      * @uses onKernelRequest
      * @uses onKernelResponse
-     *
+     * @uses onKernelTerminate
+     * @uses onKernelView
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         // The higher the priority number, the earlier the method is called.
-
         $listeners = [
-            ConsoleEvents::COMMAND => ['onConsoleStart', 9999],
-
             KernelEvents::CONTROLLER => ['onKernelController', 9999],
             KernelEvents::CONTROLLER_ARGUMENTS => [
                 ['onKernelPreControllerArguments', 9999],
@@ -72,16 +58,6 @@ class InspectorListener implements EventSubscriberInterface
             KernelEvents::VIEW => ['onKernelView', 9999],
             KernelEvents::TERMINATE => ['onKernelTerminate', -9999],
         ];
-
-        // Added ConsoleEvents in Symfony 2.3
-        if (class_exists(ConsoleEvents::class)) {
-            // Added with ConsoleEvents::ERROR in Symfony 3.3 to deprecate ConsoleEvents::EXCEPTION
-            if (class_exists(ConsoleErrorEvent::class)) {
-                $listeners[ConsoleEvents::ERROR] = ['onConsoleError', 128];
-            } else {
-                $listeners[ConsoleEvents::EXCEPTION] = ['onConsoleException', 128];
-            }
-        }
 
         return $listeners;
     }
@@ -171,16 +147,6 @@ class InspectorListener implements EventSubscriberInterface
     }
 
     /**
-     * Intercept a command execution.
-     *
-     * @throws \Exception
-     */
-    public function onConsoleStart(ConsoleCommandEvent $event): void
-    {
-        $this->startTransaction($event->getCommand()->getName());
-    }
-
-    /**
      * Handle an http kernel exception.
      *
      * @param GetResponseForExceptionEvent|ExceptionEvent $event
@@ -227,55 +193,6 @@ class InspectorListener implements EventSubscriberInterface
         $this->endSegment(self::SEGMENT_CONTROLLER);
 
         $this->startSegment(KernelEvents::VIEW);
-    }
-
-    /**
-     * Handle a console exception (used instead of ConsoleErrorEvent before
-     * Symfony 3.3 and kept for backwards compatibility).
-     *
-     * @throws \Exception
-     */
-    public function onConsoleException(ConsoleExceptionEvent $event): void
-    {
-        $this->startTransaction($event->getCommand()->getName())->setResult('error');
-
-        $this->notifyUnexpectedError($event->getException());
-    }
-
-    /**
-     * Handle a console error.
-     *
-     * @throws \Exception
-     */
-    public function onConsoleError(ConsoleErrorEvent $event): void
-    {
-        $this->startTransaction($event->getCommand()->getName())->setResult('error');
-
-        $this->notifyUnexpectedError($event->getError());
-    }
-
-    /**
-     * Be sure to start a transaction before report the exception.
-     *
-     * @throws \Exception
-     */
-    protected function startTransaction(string $name): Transaction
-    {
-        if ($this->inspector->needTransaction()) {
-            $this->inspector->startTransaction($name);
-        }
-
-        return $this->inspector->currentTransaction();
-    }
-
-    /**
-     * Report unexpected error to inspection API.
-     *
-     * @throws \Exception
-     */
-    protected function notifyUnexpectedError(Throwable $throwable): void
-    {
-        $this->inspector->reportException($throwable, false);
     }
 
     /**

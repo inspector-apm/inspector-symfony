@@ -5,7 +5,11 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="inspector_symfony_bundle.listeners.inspector_listener" class="Inspector\Symfony\Bundle\Listeners\InspectorListener">
+        <service id="Inspector\Symfony\Bundle\Listeners\KernelEventsSubscriber" public="false">
+            <argument type="service" id="inspector"/>
+            <tag name="kernel.event_subscriber" />
+        </service>
+        <service id="Inspector\Symfony\Bundle\Listeners\ConsoleEventsSubscriber" public="false">
             <argument type="service" id="inspector"/>
             <tag name="kernel.event_subscriber" />
         </service>
