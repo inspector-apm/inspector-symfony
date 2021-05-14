@@ -13,5 +13,9 @@
             <argument type="service" id="inspector"/>
             <tag name="kernel.event_subscriber" />
         </service>
+        <service id="Inspector\Symfony\Bundle\Listeners\DoctrineEventsSubscriber" public="false">
+            <argument type="service" id="inspector"/>
+            <tag name="doctrine.event_subscriber"/>
+        </service>
     </services>
 </container>
