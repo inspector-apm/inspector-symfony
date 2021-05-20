@@ -13,20 +13,12 @@ class InspectableSQLLogger implements SQLLogger
     /** @var Inspector */
     protected $inspector;
 
-    /** @var string */
-    protected $lastLabel;
-
     /** @var \Inspector\Models\PerformanceModel|\Inspector\Models\Segment */
     private $segment;
 
-    /** @var SQLLogger */
-    private $sqlLogger;
-
-    public function __construct(Inspector $inspector, \Doctrine\DBAL\Configuration $configuration)
+    public function __construct(Inspector $inspector)
     {
         $this->inspector = $inspector;
-        $this->sqlLogger = $configuration->getSQLLogger();
-        $configuration->setSQLLogger($this);
     }
 
     /**
@@ -40,8 +32,6 @@ class InspectableSQLLogger implements SQLLogger
     {
         $label = 'SQL: '.$sql;
         $this->segment = $this->inspector->startSegment(self::SEGMENT_TYPE, $label);
-
-        $this->sqlLogger->startQuery($sql, $params, $types);
     }
 
     /**
@@ -55,7 +45,5 @@ class InspectableSQLLogger implements SQLLogger
 
         $this->segment->end();
         $this->segment = null;
-
-        $this->sqlLogger->stopQuery();
     }
 }

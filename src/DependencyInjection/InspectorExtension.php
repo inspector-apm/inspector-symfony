@@ -9,7 +9,6 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class InspectorExtension extends Extension
@@ -32,13 +31,12 @@ class InspectorExtension extends Extension
         $container->setDefinition('inspector.configuration', $inspectorConfigDefinition);
 
         $inspectorDefinition = new Definition(Inspector::class, [$inspectorConfigDefinition]);
+        $inspectorDefinition->setPublic(true);
 
         $container->setDefinition('inspector', $inspectorDefinition);
 
-        // @todo: support multiple connections
-        $inspectableSqlLogger = new Definition(InspectableSQLLogger::class, [$inspectorDefinition, new Reference('doctrine.dbal.default_connection.configuration')]);
-        $inspectableSqlLogger->setLazy(false);
-        $container->setDefinition('inspector.sql.logger', $inspectableSqlLogger);
+        $inspectableSqlLoggerDefinition = new Definition(InspectableSQLLogger::class, [$inspectorDefinition]);
+        $container->setDefinition('doctrine.dbal.logger.inspectable', $inspectableSqlLoggerDefinition);
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
