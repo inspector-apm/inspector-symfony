@@ -14,6 +14,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @todo: exclude profiler monitoring
@@ -21,14 +22,18 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class KernelEventsSubscriber extends AbstractInspectorEventSubscriber
 {
-    public const SEGMENT_TYPE_PROCESS = 'process';
-    public const SEGMENT_CONTROLLER = 'controller';
+    protected const SEGMENT_TYPE_PROCESS = 'process';
+    protected const SEGMENT_CONTROLLER = 'controller';
 
     protected $segments = [];
 
-    public function __construct(Inspector $inspector)
+    /** @var RouterInterface  */
+    protected $router;
+
+    public function __construct(Inspector $inspector, RouterInterface $router)
     {
         $this->inspector = $inspector;
+        $this->router = $router;
     }
 
     /**
@@ -108,8 +113,13 @@ class KernelEventsSubscriber extends AbstractInspectorEventSubscriber
             return;
         }
 
+        // TODO: check performance on prod env
+        $request = $event->getRequest();
+        $routeInfo = $this->router->match($request->getPathInfo());
+        $route = $this->router->getRouteCollection()->get($routeInfo['_route']);
+
         $this->startTransaction(
-            $event->getRequest()->getMethod() . ' ' . $event->getRequest()->getUri()
+            $request->getMethod() . ' ' . $route->getPath()
         );
 
         $this->startSegment(KernelEvents::REQUEST);
