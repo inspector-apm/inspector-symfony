@@ -8,13 +8,13 @@ use Inspector\Inspector;
 
 class InspectableSQLLogger implements SQLLogger
 {
-    const SEGMENT_TYPE = 'SQL';
+    protected const SEGMENT_TYPE = 'SQL';
 
     /** @var Inspector */
     protected $inspector;
 
     /** @var \Inspector\Models\PerformanceModel|\Inspector\Models\Segment */
-    private $segment;
+    protected $segment;
 
     public function __construct(Inspector $inspector)
     {
@@ -30,8 +30,17 @@ class InspectableSQLLogger implements SQLLogger
      */
     public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
-        $label = 'SQL: '.$sql;
+        $label = substr($sql, 0, 50).'...';
         $this->segment = $this->inspector->startSegment(self::SEGMENT_TYPE, $label);
+
+        // TODO: connection name
+        $context = [
+            'sql' => $sql,
+        ];
+        // TODO: check if exposing bind parameters is enabled in config
+        $context['params'] = $params;
+
+        $this->segment->addContext($label, $context);
     }
 
     /**
