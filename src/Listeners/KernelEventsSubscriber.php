@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
@@ -28,8 +29,26 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     protected const SEGMENT_TYPE_PROCESS = 'process';
     protected const SEGMENT_CONTROLLER = 'controller';
 
+    /** @todo move to parameters */
+    protected const EXCLUDED_ROUTES = [
+        '_wdt',
+        '_profiler',
+        '_profiler_home',
+        '_profiler_search',
+        '_profiler_search_bar',
+        '_profiler_phpinfo',
+        '_profiler_search_results',
+        '_profiler_open_file',
+        '_profiler_router',
+        '_profiler_exception',
+        '_profiler_exception_css',
+    ];
+
     /** @var RouterInterface  */
     protected $router;
+
+    /** @var string */
+    protected $routeName;
 
     public function __construct(Inspector $inspector, RouterInterface $router)
     {
@@ -70,7 +89,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelController(ControllerEvent $event): void
     {
-        if (!$event->isMasterRequest()){
+        if (!$this->isRequestEligibleForInspection($event)){
             return;
         }
 
@@ -81,7 +100,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelPreControllerArguments(ControllerArgumentsEvent $event): void
     {
-        if (!$event->isMasterRequest()){
+        if (!$this->isRequestEligibleForInspection($event)){
             return;
         }
 
@@ -92,7 +111,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelPostControllerArguments(ControllerArgumentsEvent $event): void
     {
-        if (!$event->isMasterRequest()){
+        if (!$this->isRequestEligibleForInspection($event)){
             return;
         }
 
@@ -108,22 +127,31 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      */
     public function onKernelRequest(RequestEvent $event): void
     {
-        // TODO: use trait for compatibility
-        // TODO: track sub requests?
-        if (!$event->isMasterRequest()){
+        if (!$event->isMasterRequest()) {
             return;
         }
 
         // TODO: check performance on prod env
         $request = $event->getRequest();
-        $routeInfo = $this->router->match($request->getPathInfo());
-        $route = $this->router->getRouteCollection()->get($routeInfo['_route']);
+        try {
+            $routeInfo = $this->router->match($request->getPathInfo());
+            $this->routeName = $routeInfo['_route'];
+        } catch (\Throwable $exception) {
+            $this->routeName = $request->getPathInfo();
+        }
 
-        $this->startTransaction(
-            $request->getMethod() . ' ' . $route->getPath()
-        );
+        if (!$this->isRequestEligibleForInspection($event)){
+            return;
+        }
+
+        $this->startTransaction($event->getRequest()->getMethod() . ' ' . $this->routeName);
 
         $this->startSegment(KernelEvents::REQUEST);
+    }
+
+    public function setTransactionName(RequestEvent $event): void
+    {
+        $this->inspector->currentTransaction()->name = $event->getRequest()->getMethod().' '.$event->getRequest()->attributes->get('_route');
     }
 
     /**
@@ -131,7 +159,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if (!$event->isMasterRequest()){
+        if (!$this->isRequestEligibleForInspection($event)){
             return;
         }
 
@@ -150,7 +178,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelFinishRequest(FinishRequestEvent $event): void
     {
-        if (!$event->isMasterRequest()){
+        if (!$this->isRequestEligibleForInspection($event)){
             return;
         }
 
@@ -188,7 +216,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelTerminate(TerminateEvent $event): void
     {
-        if (!$event->isMasterRequest()){
+        if (!$this->isRequestEligibleForInspection($event)){
             return;
         }
 
@@ -197,12 +225,21 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelView(ViewEvent $event): void
     {
-        if (!$event->isMasterRequest()){
+        if (!$this->isRequestEligibleForInspection($event)){
             return;
         }
 
         $this->endSegment(self::SEGMENT_CONTROLLER);
 
         $this->startSegment(KernelEvents::VIEW);
+    }
+
+    // TODO: use trait for compatibility isMaster/isMain
+    // TODO: track sub requests?
+    protected function isRequestEligibleForInspection(KernelEvent $event): bool
+    {
+        $route = $event->getRequest()->attributes->get('_route') ?: $this->routeName;
+
+        return $event->isMasterRequest() && !in_array($route, self::EXCLUDED_ROUTES);
     }
 }
