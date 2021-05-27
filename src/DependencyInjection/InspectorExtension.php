@@ -5,10 +5,10 @@ namespace Inspector\Symfony\Bundle\DependencyInjection;
 
 use Inspector\Inspector;
 use Inspector\Symfony\Bundle\Inspectable\Doctrine\DBAL\Logging\InspectableSQLLogger;
-use Symfony\Component\Config\FileLocator;
+use Inspector\Symfony\Bundle\Listeners\ConsoleEventsSubscriber;
+use Inspector\Symfony\Bundle\Listeners\KernelEventsSubscriber;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
@@ -21,6 +21,10 @@ class InspectorExtension extends Extension
     {
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
+
+        if(!$config['enabled']) {
+            return;
+        }
 
         // Inspector configuration
         $inspectorConfigDefinition = new Definition(\Inspector\Configuration::class, [$config['ingestion_key']]);
@@ -46,8 +50,20 @@ class InspectorExtension extends Extension
 
         $container->setDefinition('doctrine.dbal.logger.inspectable', $inspectableSqlLoggerDefinition);
 
-        // Loading configuration from services.xml
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.xml');
+        $kernelEventsSubscriberDefinition = new Definition(KernelEventsSubscriber::class, [
+            new Reference('inspector'),
+            new Reference('router'),
+            new Reference('security.helper')
+        ]);
+        $kernelEventsSubscriberDefinition->setPublic(false)->addTag('kernel.event_subscriber');
+
+        $container->setDefinition(KernelEventsSubscriber::class, $kernelEventsSubscriberDefinition);
+
+        $consoleEventsSubscriberDefinition = new Definition(ConsoleEventsSubscriber::class, [
+            new Reference('inspector'),
+        ]);
+        $consoleEventsSubscriberDefinition->setPublic(false)->addTag('kernel.event_subscriber');
+
+        $container->setDefinition(ConsoleEventsSubscriber::class, $consoleEventsSubscriberDefinition);
     }
 }
