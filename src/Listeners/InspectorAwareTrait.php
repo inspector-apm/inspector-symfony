@@ -4,16 +4,17 @@
 namespace Inspector\Symfony\Bundle\Listeners;
 
 use Inspector\Inspector;
+use Inspector\Models\Segment;
 use Inspector\Models\Transaction;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Throwable;
 
-abstract class AbstractInspectorEventSubscriber implements EventSubscriberInterface
+trait InspectorAwareTrait
 {
-    /**
-     * @var Inspector
-     */
+    /** @var Inspector */
     protected $inspector;
+
+    /** @var Segment[] */
+    protected $segments = [];
 
     /**
      * Be sure to start a transaction before report the exception.
@@ -37,5 +38,23 @@ abstract class AbstractInspectorEventSubscriber implements EventSubscriberInterf
     protected function notifyUnexpectedError(Throwable $throwable): void
     {
         $this->inspector->reportException($throwable, false);
+    }
+
+    protected function startSegment(string $label): void
+    {
+        $segment = $this->inspector->startSegment(self::SEGMENT_TYPE_PROCESS, $label);
+
+        $this->segments[$label] = $segment;
+    }
+
+    protected function endSegment(string $label): void
+    {
+        if (!isset($this->segments[$label])) {
+            return;
+        }
+
+        $this->segments[$label]->end();
+
+        unset($this->segments[$label]);
     }
 }

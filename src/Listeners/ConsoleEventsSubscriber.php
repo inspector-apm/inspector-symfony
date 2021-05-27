@@ -6,15 +6,11 @@ use Inspector\Inspector;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConsoleEventsSubscriber extends AbstractInspectorEventSubscriber
+class ConsoleEventsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Inspector
-     */
-    protected $inspector;
-
-    protected $segments = [];
+    use InspectorAwareTrait;
 
     public function __construct(Inspector $inspector)
     {

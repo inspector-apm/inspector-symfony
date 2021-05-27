@@ -4,6 +4,7 @@ namespace Inspector\Symfony\Bundle\Listeners;
 
 use Inspector\Inspector;
 use Inspector\Models\Segment;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -19,12 +20,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * @todo: exclude profiler monitoring
  * @todo: use trait for compatibility isMaster/isMain
  */
-class KernelEventsSubscriber extends AbstractInspectorEventSubscriber
+class KernelEventsSubscriber implements EventSubscriberInterface
 {
-    public const SEGMENT_TYPE_PROCESS = 'process';
-    public const SEGMENT_CONTROLLER = 'controller';
+    use InspectorAwareTrait;
 
-    protected $segments = [];
+    protected const SEGMENT_TYPE_PROCESS = 'process';
+    protected const SEGMENT_CONTROLLER = 'controller';
 
     public function __construct(Inspector $inspector)
     {
@@ -193,31 +194,5 @@ class KernelEventsSubscriber extends AbstractInspectorEventSubscriber
         $this->endSegment(self::SEGMENT_CONTROLLER);
 
         $this->startSegment(KernelEvents::VIEW);
-    }
-
-    /**
-     * Workaround method, should be removed after
-     * @link https://github.com/inspector-apm/inspector-php/issues/9
-     */
-    private function startSegment(string $label): void
-    {
-        $segment = $this->inspector->startSegment(self::SEGMENT_TYPE_PROCESS, $label);
-
-        $this->segments[$label] = $segment;
-    }
-
-    /**
-     * Workaround method, should be removed after
-     * @link https://github.com/inspector-apm/inspector-php/issues/9
-     */
-    private function endSegment(string $label): void
-    {
-        if (!isset($this->segments[$label])) {
-            return;
-        }
-
-        $this->segments[$label]->end();
-
-        unset($this->segments[$label]);
     }
 }
