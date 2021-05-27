@@ -95,7 +95,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $this->endSegment(KernelEvents::REQUEST);
 
-        $this->startSegment(KernelEvents::CONTROLLER);
+        $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::CONTROLLER);
     }
 
     public function onKernelPreControllerArguments(ControllerArgumentsEvent $event): void
@@ -106,7 +106,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $this->endSegment(KernelEvents::CONTROLLER);
 
-        $this->startSegment(KernelEvents::CONTROLLER_ARGUMENTS);
+        $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::CONTROLLER_ARGUMENTS);
     }
 
     public function onKernelPostControllerArguments(ControllerArgumentsEvent $event): void
@@ -117,7 +117,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $this->endSegment(KernelEvents::CONTROLLER_ARGUMENTS);
 
-        $this->startSegment(self::SEGMENT_CONTROLLER);
+        $this->startSegment(self::SEGMENT_TYPE_PROCESS, self::SEGMENT_CONTROLLER);
     }
 
     /**
@@ -146,7 +146,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $this->startTransaction($event->getRequest()->getMethod() . ' ' . $this->routeName);
 
-        $this->startSegment(KernelEvents::REQUEST);
+        $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::REQUEST);
     }
 
     public function setTransactionName(RequestEvent $event): void
@@ -173,7 +173,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         $this->endSegment(KernelEvents::REQUEST);
         $this->endSegment(KernelEvents::VIEW);
 
-        $this->startSegment(KernelEvents::RESPONSE);
+        $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::RESPONSE);
     }
 
     public function onKernelFinishRequest(FinishRequestEvent $event): void
@@ -231,7 +231,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $this->endSegment(self::SEGMENT_CONTROLLER);
 
-        $this->startSegment(KernelEvents::VIEW);
+        $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::VIEW);
     }
 
     // TODO: use trait for compatibility isMaster/isMain
