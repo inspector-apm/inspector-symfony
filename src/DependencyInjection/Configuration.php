@@ -24,6 +24,7 @@ class Configuration implements ConfigurationInterface
             ->booleanNode('query_bindings')->defaultFalse()->end()
             ->booleanNode('user')->defaultTrue()->end()
             ->scalarNode('transport')->defaultValue('async')->end()
+            ->floatNode('server_sampling_ratio')->defaultNull()->end()
             ->end();
 
         return $tree;

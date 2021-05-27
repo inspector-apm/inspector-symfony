@@ -28,6 +28,7 @@ class InspectorExtension extends Extension
         $inspectorConfigDefinition->addMethodCall('setEnabled', [$config['enabled']]);
         $inspectorConfigDefinition->addMethodCall('setUrl', [$config['url']]);
         $inspectorConfigDefinition->addMethodCall('setTransport', [$config['transport']]);
+        $inspectorConfigDefinition->addMethodCall('serverSamplingRatio', [$config['server_sampling_ratio']]);
 
         $container->setDefinition('inspector.configuration', $inspectorConfigDefinition);
 
