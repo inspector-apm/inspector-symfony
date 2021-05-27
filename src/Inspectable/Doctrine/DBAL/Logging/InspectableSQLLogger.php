@@ -16,9 +16,13 @@ class InspectableSQLLogger implements SQLLogger
     /** @var \Inspector\Models\PerformanceModel|\Inspector\Models\Segment */
     protected $segment;
 
-    public function __construct(Inspector $inspector)
+    /** @var array */
+    protected $configuration;
+
+    public function __construct(Inspector $inspector, array $configuration)
     {
         $this->inspector = $inspector;
+        $this->configuration = $configuration;
     }
 
     /**
@@ -34,11 +38,17 @@ class InspectableSQLLogger implements SQLLogger
         $this->segment = $this->inspector->startSegment(self::SEGMENT_TYPE, $label);
 
         // TODO: connection name
-        $context = [
-            'sql' => $sql,
-        ];
-        // TODO: check if exposing bind parameters is enabled in config
-        $context['params'] = $params;
+        $context = [];
+
+        // Checks if option is set and is convertable to true
+        if (!empty($this->configuration['query_bindings'])) {
+            $context['sql'] = $sql;
+        }
+
+        // Checks if option is set and is convertable to true
+        if (!empty($this->configuration['query_bindings'])) {
+            $context['bindings'] = $params;
+        }
 
         $this->segment->addContext($label, $context);
     }

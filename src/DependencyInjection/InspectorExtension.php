@@ -38,7 +38,11 @@ class InspectorExtension extends Extension
         $container->setDefinition('inspector', $inspectorDefinition);
 
         // SQL Logger for Doctrine DBAL to use in Inspector.dev
-        $inspectableSqlLoggerDefinition = new Definition(InspectableSQLLogger::class, [new Reference('inspector')]);
+        $inspectableSqlLoggerDefinition = new Definition(InspectableSQLLogger::class, [
+            new Reference('inspector'),
+            $config
+        ]);
+
         $container->setDefinition('doctrine.dbal.logger.inspectable', $inspectableSqlLoggerDefinition);
 
         // Loading configuration from services.xml
