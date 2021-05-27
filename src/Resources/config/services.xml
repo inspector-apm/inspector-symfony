@@ -8,6 +8,7 @@
         <service id="Inspector\Symfony\Bundle\Listeners\KernelEventsSubscriber" public="false">
             <argument type="service" id="inspector"/>
             <argument type="service" id="router" />
+            <argument type="service" id="security.helper" />
             <tag name="kernel.event_subscriber" />
         </service>
         <service id="Inspector\Symfony\Bundle\Listeners\ConsoleEventsSubscriber" public="false">

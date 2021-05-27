@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * @todo: exclude profiler monitoring
@@ -44,16 +45,21 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         '_profiler_exception_css',
     ];
 
-    /** @var RouterInterface  */
-    protected $router;
 
     /** @var string */
     protected $routeName;
 
-    public function __construct(Inspector $inspector, RouterInterface $router)
+    /** @var RouterInterface  */
+    protected $router;
+
+    /** @var Security */
+    protected $security;
+
+    public function __construct(Inspector $inspector, RouterInterface $router, Security $security)
     {
         $this->inspector = $inspector;
         $this->router = $router;
+        $this->security = $security;
     }
 
     /**
@@ -66,6 +72,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      * @uses onKernelResponse
      * @uses onKernelTerminate
      * @uses onKernelView
+     * @uses setAuthUserInfo
      */
     public static function getSubscribedEvents(): array
     {
@@ -78,7 +85,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             ],
             KernelEvents::EXCEPTION => ['onKernelException', 9999],
             KernelEvents::FINISH_REQUEST => ['onKernelFinishRequest', 9999],
-            KernelEvents::REQUEST => ['onKernelRequest', 9999],
+            KernelEvents::REQUEST => [['onKernelRequest', 9999], ['setAuthUserInfo', 30]],
             KernelEvents::RESPONSE => ['onKernelResponse', 9999],
             KernelEvents::VIEW => ['onKernelView', 9999],
             KernelEvents::TERMINATE => ['onKernelTerminate', -9999],
@@ -149,9 +156,13 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::REQUEST);
     }
 
-    public function setTransactionName(RequestEvent $event): void
+    public function setAuthUserInfo(RequestEvent $event): void
     {
-        $this->inspector->currentTransaction()->name = $event->getRequest()->getMethod().' '.$event->getRequest()->attributes->get('_route');
+        $user = $this->security->getUser();
+
+        if ($user) {
+            $this->inspector->currentTransaction()->withUser($user->getUsername());
+        }
     }
 
     /**
