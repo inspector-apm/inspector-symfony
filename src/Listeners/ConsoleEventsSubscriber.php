@@ -14,9 +14,6 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
 {
     use InspectorAwareTrait;
 
-    protected const SEGMENT_TYPE_PROCESS = 'process';
-    protected const LABEL_COMMAND_EXECUTION = 'Command Execution';
-
     public function __construct(Inspector $inspector)
     {
         $this->inspector = $inspector;
@@ -49,9 +46,16 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
      */
     public function onConsoleStart(ConsoleCommandEvent $event): void
     {
-        $this->startTransaction($event->getCommand()->getName());
-
-        $this->startSegment(self::SEGMENT_TYPE_PROCESS, self::LABEL_COMMAND_EXECUTION);
+        $commandName = $event->getCommand()->getName();
+        if ($this->inspector->needTransaction()) {
+            $this->inspector->startTransaction($commandName)
+                ->addContext('Command', [
+                    'arguments' => $event->getInput()->getArguments(),
+                    'options' => $event->getInput()->getOptions(),
+                ]);
+        } elseif ($this->inspector->canAddSegments()) {
+            $this->segments[$commandName] = $this->inspector->startSegment('command', $commandName);
+        }
     }
 
     /**
@@ -61,20 +65,31 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
      */
     public function onConsoleError(ConsoleErrorEvent $event): void
     {
-        $this->inspector->currentTransaction()->setResult('error');
+        if ($this->inspector->canAddSegments()) {
+            $this->inspector->currentTransaction()->setResult('error');
+        }
 
         $this->notifyUnexpectedError($event->getError());
     }
 
     public function onConsoleTerminate(ConsoleTerminateEvent $event): void
     {
-        $this->endSegment(self::LABEL_COMMAND_EXECUTION);
+        $commandName = $event->getCommand()->getName();
+        if($this->inspector->hasTransaction() && $this->inspector->currentTransaction()->name === $commandName) {
+            $this->inspector->currentTransaction()->setResult($event->getExitCode() === 0 ? 'success' : 'error');
+        } elseif(array_key_exists($commandName, $this->segments)) {
+            $this->segments[$commandName]->end()->addContext('Command', [
+                'exit_code' => $event->getExitCode(),
+                'arguments' => $event->getInput()->getArguments(),
+                'options' => $event->getInput()->getOptions(),
+            ]);
+        }
     }
 
     public function onConsoleSignal(ConsoleSignalEvent $event): void
     {
-        $this->inspector->currentTransaction()->setResult('terminated');
-
-        $this->endSegment(self::LABEL_COMMAND_EXECUTION);
+        if ($this->inspector->canAddSegments()) {
+            $this->inspector->currentTransaction()->setResult('terminated');
+        }
     }
 }

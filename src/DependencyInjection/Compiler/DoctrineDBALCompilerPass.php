@@ -17,6 +17,7 @@ class DoctrineDBALCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        //TODO: support multiple connections
         $logger = new Reference('doctrine.dbal.logger.inspectable');
         $chainLogger = $container->getDefinition('doctrine.dbal.logger.chain');
         if (! method_exists(SQLParserUtils::class, 'getPositionalPlaceholderPositions') && method_exists(LoggerChain::class, 'addLogger')) {
