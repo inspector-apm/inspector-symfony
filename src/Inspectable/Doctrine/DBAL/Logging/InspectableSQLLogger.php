@@ -34,23 +34,17 @@ class InspectableSQLLogger implements SQLLogger
      */
     public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
-        $label = substr($sql, 0, 50).'...';
-        $this->segment = $this->inspector->startSegment(self::SEGMENT_TYPE, $label);
+        $this->segment = $this->inspector->startSegment(self::SEGMENT_TYPE, substr($sql, 0, 50));
 
-        // TODO: connection name
-        $context = [];
+        $context = ['sql' => $sql];
 
-        // Checks if option is set and is convertable to true
-        if (!empty($this->configuration['query_bindings'])) {
-            $context['sql'] = $sql;
-        }
-
-        // Checks if option is set and is convertable to true
+        // Checks if option is set and is convertible to true
         if (!empty($this->configuration['query_bindings'])) {
             $context['bindings'] = $params;
         }
 
-        $this->segment->addContext($label, $context);
+        // TODO: connection name
+        $this->segment->addContext('DB', $context);
     }
 
     /**
