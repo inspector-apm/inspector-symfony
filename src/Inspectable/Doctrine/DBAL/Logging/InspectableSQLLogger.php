@@ -8,8 +8,6 @@ use Inspector\Inspector;
 
 class InspectableSQLLogger implements SQLLogger
 {
-    protected const SEGMENT_TYPE = 'SQL';
-
     /** @var Inspector */
     protected $inspector;
 
@@ -34,7 +32,7 @@ class InspectableSQLLogger implements SQLLogger
      */
     public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
-        $this->segment = $this->inspector->startSegment(self::SEGMENT_TYPE, substr($sql, 0, 50));
+        $this->segment = $this->inspector->startSegment('SQL', substr($sql, 0, 50));
 
         $context = ['sql' => $sql];
 

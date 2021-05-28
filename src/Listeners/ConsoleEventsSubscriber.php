@@ -14,9 +14,6 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
 {
     use InspectorAwareTrait;
 
-    protected const SEGMENT_TYPE_PROCESS = 'process';
-    protected const LABEL_COMMAND_EXECUTION = 'Command Execution';
-
     public function __construct(Inspector $inspector)
     {
         $this->inspector = $inspector;
