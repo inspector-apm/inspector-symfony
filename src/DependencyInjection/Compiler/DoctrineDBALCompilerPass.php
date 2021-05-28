@@ -3,14 +3,13 @@
 namespace Inspector\Symfony\Bundle\DependencyInjection\Compiler;
 
 /** Compatibility with doctrine/dbal < 2.10.0 */
-
 use Doctrine\DBAL\Logging\LoggerChain;
 use Doctrine\DBAL\SQLParserUtils;
+/** End compatibility with doctrine/dbal < 2.10.0 */
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-/** End compatibility with doctrine/dbal < 2.10.0 */
 class DoctrineDBALCompilerPass implements CompilerPassInterface
 {
     /**
