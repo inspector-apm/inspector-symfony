@@ -32,6 +32,7 @@ class InspectableSQLLogger implements SQLLogger
      */
     public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
+        // TODO: connection name
         $this->segment = $this->inspector->startSegment('SQL', substr($sql, 0, 50));
 
         $context = ['sql' => $sql];
@@ -41,7 +42,6 @@ class InspectableSQLLogger implements SQLLogger
             $context['bindings'] = $params;
         }
 
-        // TODO: connection name
         $this->segment->addContext('DB', $context);
     }
 
