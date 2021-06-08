@@ -20,7 +20,6 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * @todo: exclude profiler monitoring
  * @todo: use trait for compatibility isMaster/isMain
  */
 class KernelEventsSubscriber implements EventSubscriberInterface
@@ -30,21 +29,8 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     protected const SEGMENT_TYPE_PROCESS = 'process';
     protected const SEGMENT_CONTROLLER = 'controller';
 
-    /** @todo move to parameters */
-    protected const EXCLUDED_ROUTES = [
-        '_wdt',
-        '_profiler',
-        '_profiler_home',
-        '_profiler_search',
-        '_profiler_search_bar',
-        '_profiler_phpinfo',
-        '_profiler_search_results',
-        '_profiler_open_file',
-        '_profiler_router',
-        '_profiler_exception',
-        '_profiler_exception_css',
-    ];
-
+    /** @var string[] */
+    protected $ignoredUrls = [];
 
     /** @var string */
     protected $routeName;
@@ -55,11 +41,16 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     /** @var Security */
     protected $security;
 
-    public function __construct(Inspector $inspector, RouterInterface $router, Security $security)
-    {
+    public function __construct(
+        Inspector $inspector,
+        RouterInterface $router,
+        Security $security,
+        array $ignoredUrls
+    ) {
         $this->inspector = $inspector;
         $this->router = $router;
         $this->security = $security;
+        $this->ignoredUrls = $ignoredUrls;
     }
 
     /**
@@ -251,6 +242,6 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     {
         $route = $event->getRequest()->attributes->get('_route') ?: $this->routeName;
 
-        return $event->isMasterRequest() && !in_array($route, self::EXCLUDED_ROUTES);
+        return $event->isMasterRequest() && !in_array($route, $this->ignoredUrls);
     }
 }

@@ -54,7 +54,8 @@ class InspectorExtension extends Extension
         $kernelEventsSubscriberDefinition = new Definition(KernelEventsSubscriber::class, [
             new Reference('inspector'),
             new Reference('router'),
-            new Reference('security.helper')
+            new Reference('security.helper'),
+            $config['ignore_urls']
         ]);
         $kernelEventsSubscriberDefinition->setPublic(false)->addTag('kernel.event_subscriber');
 
