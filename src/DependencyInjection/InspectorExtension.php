@@ -22,10 +22,6 @@ class InspectorExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        if(!$config['enabled']) {
-            return;
-        }
-
         // Inspector configuration
         $inspectorConfigDefinition = new Definition(\Inspector\Configuration::class, [$config['ingestion_key']]);
         $inspectorConfigDefinition->setPublic(false);
@@ -35,6 +31,10 @@ class InspectorExtension extends Extension
         $inspectorConfigDefinition->addMethodCall('serverSamplingRatio', [$config['server_sampling_ratio']]);
 
         $container->setDefinition('inspector.configuration', $inspectorConfigDefinition);
+
+        if(!$config['enabled']) {
+            return;
+        }
 
         // Inspector service itself
         $inspectorDefinition = new Definition(Inspector::class, [$inspectorConfigDefinition]);
@@ -50,6 +50,7 @@ class InspectorExtension extends Extension
 
         $container->setDefinition('doctrine.dbal.logger.inspectable', $inspectableSqlLoggerDefinition);
 
+        // Kernel events subscriber: request, response etc.
         $kernelEventsSubscriberDefinition = new Definition(KernelEventsSubscriber::class, [
             new Reference('inspector'),
             new Reference('router'),
@@ -59,6 +60,7 @@ class InspectorExtension extends Extension
 
         $container->setDefinition(KernelEventsSubscriber::class, $kernelEventsSubscriberDefinition);
 
+        // Console events subscriber
         $consoleEventsSubscriberDefinition = new Definition(ConsoleEventsSubscriber::class, [
             new Reference('inspector'),
         ]);
