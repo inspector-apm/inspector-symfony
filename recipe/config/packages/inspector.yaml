@@ -1,4 +1,22 @@
 inspector:
     ingestion_key: '%env(INSPECTOR_INGESTION_KEY)%'
+    url: https://ingest.inspector.dev
     enabled: true
-
+    unhandled_exceptions: true
+    query: true
+    query_bindings: false
+    user: true
+    transport: async
+    server_sampling_ratio: 0
+    ignore_urls:
+        - '_wdt'
+        - '_profiler'
+        - '_profiler_home'
+        - '_profiler_search'
+        - '_profiler_search_bar'
+        - '_profiler_phpinfo'
+        - '_profiler_search_results'
+        - '_profiler_open_file'
+        - '_profiler_router'
+        - '_profiler_exception'
+        - '_profiler_exception_css'

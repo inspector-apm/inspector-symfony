@@ -22,6 +22,12 @@ class InspectorExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
+        $container->setParameter('inspector.configuration', $config);
+
+        if(true !== $config['enabled']) {
+            return;
+        }
+
         // Inspector configuration
         $inspectorConfigDefinition = new Definition(\Inspector\Configuration::class, [$config['ingestion_key']]);
         $inspectorConfigDefinition->setPublic(false);
@@ -30,25 +36,13 @@ class InspectorExtension extends Extension
         $inspectorConfigDefinition->addMethodCall('setTransport', [$config['transport']]);
         $inspectorConfigDefinition->addMethodCall('serverSamplingRatio', [$config['server_sampling_ratio']]);
 
-        $container->setDefinition('inspector.configuration', $inspectorConfigDefinition);
-
-        if(!$config['enabled']) {
-            return;
-        }
+        $container->setDefinition('inspector.configuration.internal', $inspectorConfigDefinition);
 
         // Inspector service itself
         $inspectorDefinition = new Definition(Inspector::class, [$inspectorConfigDefinition]);
         $inspectorDefinition->setPublic(true);
 
         $container->setDefinition('inspector', $inspectorDefinition);
-
-        // SQL Logger for Doctrine DBAL to use in Inspector.dev
-        $inspectableSqlLoggerDefinition = new Definition(InspectableSQLLogger::class, [
-            new Reference('inspector'),
-            $config
-        ]);
-
-        $container->setDefinition('doctrine.dbal.logger.inspectable', $inspectableSqlLoggerDefinition);
 
         // Kernel events subscriber: request, response etc.
         $kernelEventsSubscriberDefinition = new Definition(KernelEventsSubscriber::class, [
