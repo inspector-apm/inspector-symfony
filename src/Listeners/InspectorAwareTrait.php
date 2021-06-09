@@ -40,11 +40,13 @@ trait InspectorAwareTrait
         $this->inspector->reportException($throwable, false);
     }
 
-    protected function startSegment(string $type, string $label = null): void
+    protected function startSegment(string $type, string $label = null): Segment
     {
         $segment = $this->inspector->startSegment($type, $label);
 
         $this->segments[$label] = $segment;
+
+        return $segment;
     }
 
     protected function endSegment(string $label): void
