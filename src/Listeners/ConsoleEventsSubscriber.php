@@ -14,9 +14,18 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
 {
     use InspectorAwareTrait;
 
-    public function __construct(Inspector $inspector)
+    /** @var string[] Full FQCN of command class */
+    protected $ignoredCommands;
+
+    /**
+     * ConsoleEventsSubscriber constructor.
+     * @param Inspector $inspector
+     * @param string[] $ignoredCommands Full FQCN of command class
+     */
+    public function __construct(Inspector $inspector, array $ignoredCommands)
     {
         $this->inspector = $inspector;
+        $this->ignoredCommands = $ignoredCommands;
     }
 
     /**
@@ -46,7 +55,11 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
      */
     public function onConsoleStart(ConsoleCommandEvent $event): void
     {
-        $commandName = $event->getCommand()->getName();
+        $command = $event->getCommand();
+        if (null === $command || $this->isIgnored(get_class($command))) {
+            return;
+        }
+        $commandName = $command->getName();
         if ($this->inspector->needTransaction()) {
             $this->inspector->startTransaction($commandName)
                 ->addContext('Command', [
@@ -65,6 +78,11 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
      */
     public function onConsoleError(ConsoleErrorEvent $event): void
     {
+        $command = $event->getCommand();
+        if (null === $command || $this->isIgnored(get_class($command))) {
+            return;
+        }
+
         if ($this->inspector->canAddSegments()) {
             $this->inspector->currentTransaction()->setResult('error');
         }
@@ -74,7 +92,12 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
 
     public function onConsoleTerminate(ConsoleTerminateEvent $event): void
     {
-        $commandName = $event->getCommand()->getName();
+        $command = $event->getCommand();
+        if (null === $command || $this->isIgnored(get_class($command))) {
+            return;
+        }
+
+        $commandName = $command->getName();
         if($this->inspector->hasTransaction() && $this->inspector->currentTransaction()->name === $commandName) {
             $this->inspector->currentTransaction()->setResult($event->getExitCode() === 0 ? 'success' : 'error');
         } elseif(array_key_exists($commandName, $this->segments)) {
@@ -88,8 +111,18 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
 
     public function onConsoleSignal(ConsoleSignalEvent $event): void
     {
+        $command = $event->getCommand();
+        if (null === $command || $this->isIgnored(get_class($command))) {
+            return;
+        }
+
         if ($this->inspector->canAddSegments()) {
             $this->inspector->currentTransaction()->setResult('terminated');
         }
+    }
+
+    protected function isIgnored(string $fqcn): bool
+    {
+        return in_array($fqcn, $this->ignoredCommands);
     }
 }
