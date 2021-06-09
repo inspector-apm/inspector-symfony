@@ -66,9 +66,7 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
                     'arguments' => $event->getInput()->getArguments(),
                     'options' => $event->getInput()->getOptions(),
                 ]);
-        }
-
-        if ($this->inspector->canAddSegments()) {
+        } elseif ($this->inspector->canAddSegments()) {
             $this->segments[$commandName] = $this->inspector->startSegment('command', $commandName);
         }
     }
@@ -102,9 +100,7 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
         $commandName = $command->getName();
         if($this->inspector->hasTransaction() && $this->inspector->currentTransaction()->name === $commandName) {
             $this->inspector->currentTransaction()->setResult($event->getExitCode() === 0 ? 'success' : 'error');
-        }
-
-        if(array_key_exists($commandName, $this->segments)) {
+        } elseif(array_key_exists($commandName, $this->segments)) {
             $this->segments[$commandName]->end()->addContext('Command', [
                 'exit_code' => $event->getExitCode(),
                 'arguments' => $event->getInput()->getArguments(),
