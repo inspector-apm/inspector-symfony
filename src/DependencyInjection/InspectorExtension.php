@@ -58,6 +58,7 @@ class InspectorExtension extends Extension
         // Console events subscriber
         $consoleEventsSubscriberDefinition = new Definition(ConsoleEventsSubscriber::class, [
             new Reference('inspector'),
+            $config['ignore_commands'],
         ]);
         $consoleEventsSubscriberDefinition->setPublic(false)->addTag('kernel.event_subscriber');
 
