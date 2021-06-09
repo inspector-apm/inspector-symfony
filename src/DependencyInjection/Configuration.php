@@ -26,6 +26,7 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('transport')->defaultValue('async')->end()
             ->floatNode('server_sampling_ratio')->defaultValue(0)->end()
             ->arrayNode('ignore_urls')->scalarPrototype()->end()->end()
+            ->arrayNode('ignore_commands')->scalarPrototype()->end()->end()
             ->end();
 
         return $tree;

@@ -20,3 +20,4 @@ inspector:
         - '_profiler_router'
         - '_profiler_exception'
         - '_profiler_exception_css'
+    ignore_commands: []
