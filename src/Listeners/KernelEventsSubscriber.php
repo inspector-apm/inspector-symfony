@@ -115,7 +115,9 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $this->endSegment(KernelEvents::CONTROLLER_ARGUMENTS);
 
-        $this->startSegment(self::SEGMENT_TYPE_PROCESS, self::SEGMENT_CONTROLLER);
+        $controllerLabel = $event->getRequest()->attributes->get('_controller');
+
+        $this->startSegment(self::SEGMENT_TYPE_PROCESS, $controllerLabel);
     }
 
     /**
@@ -171,7 +173,8 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         //TODO: $this->inspector->endSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::REQUEST);
         /** @var Segment $segment */
-        $this->endSegment(self::SEGMENT_CONTROLLER);
+        $controllerLabel = $event->getRequest()->attributes->get('_controller');
+        $this->endSegment($controllerLabel);
         $this->endSegment(KernelEvents::REQUEST);
         $this->endSegment(KernelEvents::VIEW);
 
