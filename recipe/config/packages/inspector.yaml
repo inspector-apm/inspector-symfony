@@ -21,3 +21,11 @@ inspector:
         - '_profiler_exception'
         - '_profiler_exception_css'
     ignore_commands: []
+
+services:
+    Inspector\Symfony\Bundle\Command\InspectorTestCommand:
+        arguments:
+          [ '@inspector', '@logger', '@parameter_bag' ]
+        tags:
+            - { name: 'console.command', command: 'inspector:test' }
+
