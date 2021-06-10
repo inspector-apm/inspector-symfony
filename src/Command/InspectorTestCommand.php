@@ -67,7 +67,7 @@ class InspectorTestCommand extends Command
             usleep(10 * 1000);
 
             !empty($this->configuration->getIngestionKey())
-                ? $io->info('✅ Inspector key installed.')
+                ? $io->text('✅ Inspector key installed.')
                 : $io->warning('❌ Inspector key not specified. Make sure you specify the INSPECTOR_INGESTION_KEY in your .env file.');
 
             $segment->addContext('example payload', ['key' => $this->configuration->getIngestionKey()]);
@@ -78,7 +78,7 @@ class InspectorTestCommand extends Command
             usleep(10 * 1000);
 
             $this->configuration->isEnabled()
-                ? $io->info('✅ Inspector is enabled.')
+                ? $io->text('✅ Inspector is enabled.')
                 : $io->warning('❌ Inspector is actually disabled, turn to true the `enable` field of the `inspector` config file.');
 
             $segment->addContext('another payload', ['enable' => $this->configuration->isEnabled()]);
@@ -89,7 +89,7 @@ class InspectorTestCommand extends Command
             usleep(10 * 1000);
 
             function_exists('curl_version')
-                ? $io->info('✅ CURL extension is enabled.')
+                ? $io->text('✅ CURL extension is enabled.')
                 : $io->warning('❌ CURL is actually disabled so your app could not be able to send data to Inspector.');
 
             $segment->addContext('another payload', ['foo' => 'bar']);
@@ -108,7 +108,7 @@ class InspectorTestCommand extends Command
         /*
          * Loading demo data
          */
-        $io->info('Loading demo data...');
+        $io->text('Loading demo data...');
 
         foreach ([1, 2, 3, 4, 5, 6] as $minutes) {
             $this->inspector->startTransaction("Other transactions")
