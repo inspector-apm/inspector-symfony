@@ -39,7 +39,6 @@ class DoctrineDBALCompilerPass implements CompilerPassInterface
         $container->setDefinition('doctrine.dbal.logger.inspectable', $inspectableSqlLoggerDefinition);
 
         // Adding inspectable logger to the Doctrine logger
-        //TODO: support multiple connections
         $logger = new Reference('doctrine.dbal.logger.inspectable');
         $chainLogger = $container->getDefinition('doctrine.dbal.logger.chain');
         if (! method_exists(SQLParserUtils::class, 'getPositionalPlaceholderPositions') && method_exists(LoggerChain::class, 'addLogger')) {
@@ -49,6 +48,12 @@ class DoctrineDBALCompilerPass implements CompilerPassInterface
             $loggers = $chainLogger->getArgument(0);
             array_push($loggers, $logger);
             $chainLogger->replaceArgument(0, $loggers);
+        }
+
+        /** @var array<string, string> $connections */
+        $connections = $container->getParameter('doctrine.connections');
+        foreach ($connections as $name => $service) {
+            $container->getDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $name))->addMethodCall('setSQLLogger', [$logger]);
         }
     }
 }
