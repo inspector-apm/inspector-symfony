@@ -117,7 +117,20 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $controllerLabel = $event->getRequest()->attributes->get('_controller');
 
-        $this->startSegment(self::SEGMENT_TYPE_PROCESS, $controllerLabel);
+        $arguments = [];
+        foreach ($event->getArguments() as $argument) {
+            if (is_object($argument)) {
+                $args = ['class' => get_class($argument)];
+                if (method_exists($argument, 'getId')) {
+                    $args['id'] = $argument->getId();
+                }
+                $arguments[] = $args;
+            } else {
+                $arguments[] = $argument;
+            }
+        }
+        $segment = $this->startSegment(self::SEGMENT_TYPE_PROCESS, $controllerLabel);
+        $segment->addContext($controllerLabel, $arguments);
     }
 
     /**
