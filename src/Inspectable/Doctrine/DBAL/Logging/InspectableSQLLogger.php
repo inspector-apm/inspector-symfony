@@ -38,7 +38,7 @@ class InspectableSQLLogger implements SQLLogger
         $context = ['sql' => $sql];
 
         // Checks if option is set and is convertible to true
-        if (!empty($this->configuration['query_bindings'])) {
+        if (!empty($this->configuration['query_bindings']) && $params) {
             $context['bindings'] = $params;
         }
 
