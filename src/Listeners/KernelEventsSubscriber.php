@@ -27,7 +27,6 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     use InspectorAwareTrait;
 
     protected const SEGMENT_TYPE_PROCESS = 'process';
-    protected const SEGMENT_CONTROLLER = 'controller';
 
     /** @var string[] */
     protected $ignoredUrls = [];
@@ -115,7 +114,22 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $this->endSegment(KernelEvents::CONTROLLER_ARGUMENTS);
 
-        $this->startSegment(self::SEGMENT_TYPE_PROCESS, self::SEGMENT_CONTROLLER);
+        $controllerLabel = $event->getRequest()->attributes->get('_controller');
+
+        $arguments = [];
+        foreach ($event->getArguments() as $argument) {
+            if (is_object($argument)) {
+                $args = ['class' => get_class($argument)];
+                if (method_exists($argument, 'getId')) {
+                    $args['id'] = $argument->getId();
+                }
+                $arguments[] = $args;
+            } else {
+                $arguments[] = $argument;
+            }
+        }
+        $segment = $this->startSegment(self::SEGMENT_TYPE_PROCESS, $controllerLabel);
+        $segment->addContext($controllerLabel, ['arguments' => $arguments]);
     }
 
     /**
@@ -129,20 +143,21 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // TODO: check performance on prod env
         $request = $event->getRequest();
         try {
             $routeInfo = $this->router->match($request->getPathInfo());
             $this->routeName = $routeInfo['_route'];
+            $prefix = ' /';
         } catch (\Throwable $exception) {
             $this->routeName = $request->getPathInfo();
+            $prefix = '';
         }
 
         if (!$this->isRequestEligibleForInspection($event)){
             return;
         }
 
-        $this->startTransaction($event->getRequest()->getMethod() . ' /' . $this->routeName);
+        $this->startTransaction($event->getRequest()->getMethod() . $prefix . $this->routeName);
 
         $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::REQUEST);
     }
@@ -169,13 +184,22 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        //TODO: $this->inspector->endSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::REQUEST);
         /** @var Segment $segment */
-        $this->endSegment(self::SEGMENT_CONTROLLER);
+        $controllerLabel = $event->getRequest()->attributes->get('_controller');
+        if ($controllerLabel) {
+            $this->endSegment($controllerLabel);
+        }
+
         $this->endSegment(KernelEvents::REQUEST);
         $this->endSegment(KernelEvents::VIEW);
-
-        $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::RESPONSE);
+        $response = $event->getResponse();
+        $segment = $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::RESPONSE);
+        $segment->addContext(KernelEvents::RESPONSE, ['response' => [
+            'headers' => $response->headers->all(),
+            'protocolVersion' => $response->getProtocolVersion(),
+            'statusCode' => $response->getStatusCode(),
+            'charset' => $response->getCharset(),
+        ]]);
     }
 
     public function onKernelFinishRequest(FinishRequestEvent $event): void
@@ -231,7 +255,10 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->endSegment(self::SEGMENT_CONTROLLER);
+        $controllerLabel = $event->getRequest()->attributes->get('_controller');
+        if ($controllerLabel) {
+            $this->endSegment($controllerLabel);
+        }
 
         $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::VIEW);
     }

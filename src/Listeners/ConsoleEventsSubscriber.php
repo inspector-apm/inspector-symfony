@@ -83,10 +83,6 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($this->inspector->canAddSegments()) {
-            $this->inspector->currentTransaction()->setResult('error');
-        }
-
         $this->notifyUnexpectedError($event->getError());
     }
 
