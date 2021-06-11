@@ -149,18 +149,15 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         try {
             $routeInfo = $this->router->match($request->getPathInfo());
             $this->routeName = $routeInfo['_route'];
-            $prefix = ' /';
         } catch (\Throwable $exception) {
             $this->routeName = $request->getPathInfo();
-            $prefix = '';
         }
 
         if (!$this->isRequestEligibleForInspection($event)){
             return;
         }
 
-        $this->startTransaction($event->getRequest()->getMethod() . $prefix . $this->routeName);
-
+        $this->startTransaction($event->getRequest()->getMethod() . '/' . trim($this->routeName, '/'));
         $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::REQUEST);
     }
 
