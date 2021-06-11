@@ -192,8 +192,14 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $this->endSegment(KernelEvents::REQUEST);
         $this->endSegment(KernelEvents::VIEW);
-
-        $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::RESPONSE);
+        $response = $event->getResponse();
+        $segment = $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::RESPONSE);
+        $segment->addContext(KernelEvents::RESPONSE, ['response' => [
+            'headers' => (string)$response->headers,
+            'protocolVersion' => $response->getProtocolVersion(),
+            'statusCode' => $response->getStatusCode(),
+            'charset' => $response->getCharset(),
+        ]]);
     }
 
     public function onKernelFinishRequest(FinishRequestEvent $event): void
