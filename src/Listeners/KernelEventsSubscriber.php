@@ -26,7 +26,9 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 {
     use InspectorAwareTrait;
 
+    protected const SEGMENT_TYPE_CONTROLLER = 'controller';
     protected const SEGMENT_TYPE_PROCESS = 'process';
+    protected const SEGMENT_TYPE_TEMPLATE = 'template';
 
     /** @var string[] */
     protected $ignoredUrls = [];
@@ -92,7 +94,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $this->endSegment(KernelEvents::REQUEST);
 
-        $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::CONTROLLER);
+        $this->startSegment(self::SEGMENT_TYPE_CONTROLLER, KernelEvents::CONTROLLER);
     }
 
     public function onKernelPreControllerArguments(ControllerArgumentsEvent $event): void
@@ -103,7 +105,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $this->endSegment(KernelEvents::CONTROLLER);
 
-        $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::CONTROLLER_ARGUMENTS);
+        $this->startSegment(self::SEGMENT_TYPE_CONTROLLER, KernelEvents::CONTROLLER_ARGUMENTS);
     }
 
     public function onKernelPostControllerArguments(ControllerArgumentsEvent $event): void
@@ -128,7 +130,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
                 $arguments[] = $argument;
             }
         }
-        $segment = $this->startSegment(self::SEGMENT_TYPE_PROCESS, $controllerLabel);
+        $segment = $this->startSegment(self::SEGMENT_TYPE_CONTROLLER, $controllerLabel);
         $segment->addContext($controllerLabel, ['arguments' => $arguments]);
     }
 
@@ -220,21 +222,16 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      */
     public function onKernelException($event): void
     {
-
         // Compatibility with Symfony < 5 and Symfony >=5
         // The additional `method_exists` check is to prevent errors in Symfony 4.3
         // where the ExceptionEvent exists and is used but doesn't implement
         // the `getThrowable` method, which was introduced in Symfony 4.4
         if ($event instanceof ExceptionEvent && method_exists($event, 'getThrowable')) {
-
             $this->startTransaction(get_class($event->getThrowable()))->setResult('error');
             $this->notifyUnexpectedError($event->getThrowable());
-
         } elseif ($event instanceof GetResponseForExceptionEvent) {
-
             $this->startTransaction(get_class($event->getException()))->setResult('error');
             $this->notifyUnexpectedError($event->getException());
-
         } else {
             throw new \LogicException('Invalid exception event.');
         }
@@ -260,7 +257,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             $this->endSegment($controllerLabel);
         }
 
-        $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::VIEW);
+        $this->startSegment(self::SEGMENT_TYPE_TEMPLATE, KernelEvents::VIEW);
     }
 
     // TODO: use trait for compatibility isMaster/isMain
