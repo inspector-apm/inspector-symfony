@@ -143,7 +143,6 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // TODO: check performance on prod env
         $request = $event->getRequest();
         try {
             $routeInfo = $this->router->match($request->getPathInfo());
@@ -185,10 +184,12 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        //TODO: $this->inspector->endSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::REQUEST);
         /** @var Segment $segment */
         $controllerLabel = $event->getRequest()->attributes->get('_controller');
-        $this->endSegment($controllerLabel);
+        if ($controllerLabel) {
+            $this->endSegment($controllerLabel);
+        }
+
         $this->endSegment(KernelEvents::REQUEST);
         $this->endSegment(KernelEvents::VIEW);
 
@@ -249,7 +250,9 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         }
 
         $controllerLabel = $event->getRequest()->attributes->get('_controller');
-        $this->endSegment($controllerLabel);
+        if ($controllerLabel) {
+            $this->endSegment($controllerLabel);
+        }
 
         $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::VIEW);
     }
