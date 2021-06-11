@@ -27,7 +27,6 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     use InspectorAwareTrait;
 
     protected const SEGMENT_TYPE_PROCESS = 'process';
-    protected const SEGMENT_CONTROLLER = 'controller';
 
     /** @var string[] */
     protected $ignoredUrls = [];
@@ -130,7 +129,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             }
         }
         $segment = $this->startSegment(self::SEGMENT_TYPE_PROCESS, $controllerLabel);
-        $segment->addContext($controllerLabel, $arguments);
+        $segment->addContext($controllerLabel, ['arguments' => $arguments]);
     }
 
     /**
@@ -249,7 +248,8 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->endSegment(self::SEGMENT_CONTROLLER);
+        $controllerLabel = $event->getRequest()->attributes->get('_controller');
+        $this->endSegment($controllerLabel);
 
         $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::VIEW);
     }
