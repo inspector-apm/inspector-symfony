@@ -11,6 +11,8 @@
         <ini name="intl.default_locale" value="en" />
         <ini name="intl.error_level" value="0" />
         <ini name="memory_limit" value="-1" />
+        <server name="APP_ENV" value="test" force="true" />
+        <env name="KERNEL_CLASS" value="Inspector\Symfony\Bundle\Tests\InspectorTestingKernel" />
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0" />
     </php>
 

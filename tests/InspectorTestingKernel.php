@@ -2,6 +2,7 @@
 
 namespace Inspector\Symfony\Bundle\Tests;
 
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Inspector\Symfony\Bundle\InspectorBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -18,11 +19,11 @@ class InspectorTestingKernel extends Kernel
     /**
      * @inheritDoc
      */
-    public function __construct(array $inspectorConfig = [])
+    public function __construct(string $environment, bool $debug, array $inspectorConfig = [])
     {
         $this->inspectorConfig = $inspectorConfig;
 
-        parent::__construct('test', true);
+        parent::__construct($environment, $debug);
     }
 
     /**
@@ -31,6 +32,7 @@ class InspectorTestingKernel extends Kernel
     public function registerBundles()
     {
         return [
+            new DoctrineBundle(),
             new InspectorBundle(),
         ];
     }

@@ -3,30 +3,24 @@
 namespace Inspector\Symfony\Bundle\Tests;
 
 use Inspector\Inspector;
-use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class IntegrationTest extends TestCase
+class IntegrationTest extends KernelTestCase
 {
     public function testServiceWiring()
     {
-        $kernel = new InspectorTestingKernel();
-        $kernel->boot();
+        self::bootKernel(['environment' => 'test', 'debug' => false]);
 
-        $container = $kernel->getContainer();
-
-        $inspectorService = $container->get('inspector');
+        $inspectorService = static::getContainer()->get('inspector');
 
         $this->assertInstanceOf(Inspector::class, $inspectorService);
     }
 
     public function testServiceWiringWithConfiguration()
     {
-        $kernel = new InspectorTestingKernel();
-        $kernel->boot();
+        self::bootKernel(['environment' => 'test', 'debug' => false]);
 
-        $container = $kernel->getContainer();
-
-        $inspectorService = $container->get('inspector');
+        $inspectorService = static::getContainer()->get('inspector');
 
         $this->assertFalse($inspectorService->hasTransaction());
     }
