@@ -20,12 +20,13 @@
         "symfony/event-dispatcher": "^5.2",
         "symfony/console": "^5.2",
         "symfony/framework-bundle": "^5.2",
-        "symfony/yaml": "^5.2"
+        "symfony/yaml": "^5.2",
+        "symfony/security-bundle": "^5.2"
 	},
     "require-dev": {
-        "phpunit/phpunit": "^7.0",
-        "symfony/phpunit-bridge": "^5.2",
-        "doctrine/doctrine-bundle": "^2.4"
+        "doctrine/doctrine-bundle": "^2.4",
+        "phpunit/phpunit": "^9.5",
+        "symfony/test-pack": "^1.0"
     },
 	"autoload": {
         "psr-4": {
