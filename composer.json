@@ -31,7 +31,7 @@
     },
 	"autoload-dev": {
         "psr-4": {
-            "Inspector\\Symfony\\Tests\\": "tests/"
+            "Inspector\\Symfony\\Bundle\\Tests\\": "tests/"
         }
     },
 	"minimum-stability": "dev",
