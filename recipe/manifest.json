@@ -6,6 +6,6 @@
         "config/": "%CONFIG_DIR%/"
     },
     "env": {
-        "INSPECTOR_API_KEY": ""
+        "INSPECTOR_INGESTION_KEY": ""
     }
 }

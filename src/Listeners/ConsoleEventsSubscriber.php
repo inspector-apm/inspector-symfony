@@ -3,6 +3,7 @@
 namespace Inspector\Symfony\Bundle\Listeners;
 
 use Inspector\Inspector;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
@@ -14,13 +15,13 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
 {
     use InspectorAwareTrait;
 
-    /** @var string[] Full FQCN of command class */
+    /** @var string[] command names */
     protected $ignoredCommands;
 
     /**
      * ConsoleEventsSubscriber constructor.
      * @param Inspector $inspector
-     * @param string[] $ignoredCommands Full FQCN of command class
+     * @param string[] $ignoredCommands command names
      */
     public function __construct(Inspector $inspector, array $ignoredCommands)
     {
@@ -56,7 +57,7 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
     public function onConsoleStart(ConsoleCommandEvent $event): void
     {
         $command = $event->getCommand();
-        if (null === $command || $this->isIgnored(get_class($command))) {
+        if (null === $command || $this->isIgnored($command)) {
             return;
         }
         $commandName = $command->getName();
@@ -79,7 +80,7 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
     public function onConsoleError(ConsoleErrorEvent $event): void
     {
         $command = $event->getCommand();
-        if (null === $command || $this->isIgnored(get_class($command))) {
+        if (null === $command || $this->isIgnored($command)) {
             return;
         }
 
@@ -89,7 +90,7 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
     public function onConsoleTerminate(ConsoleTerminateEvent $event): void
     {
         $command = $event->getCommand();
-        if (null === $command || $this->isIgnored(get_class($command))) {
+        if (null === $command || $this->isIgnored($command)) {
             return;
         }
 
@@ -108,7 +109,7 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
     public function onConsoleSignal(ConsoleSignalEvent $event): void
     {
         $command = $event->getCommand();
-        if (null === $command || $this->isIgnored(get_class($command))) {
+        if (null === $command || $this->isIgnored($command)) {
             return;
         }
 
@@ -117,8 +118,11 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
         }
     }
 
-    protected function isIgnored(string $fqcn): bool
+    protected function isIgnored(Command $command): bool
     {
-        return in_array($fqcn, $this->ignoredCommands);
+        return in_array($command->getName(), $this->ignoredCommands)
+            || 0 === strpos($command->getName(), 'debug:')
+            || 0 === strpos($command->getName(), 'make:')
+            ;
     }
 }

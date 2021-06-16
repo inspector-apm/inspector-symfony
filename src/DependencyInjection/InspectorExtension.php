@@ -4,7 +4,6 @@
 namespace Inspector\Symfony\Bundle\DependencyInjection;
 
 use Inspector\Inspector;
-use Inspector\Symfony\Bundle\Inspectable\Doctrine\DBAL\Logging\InspectableSQLLogger;
 use Inspector\Symfony\Bundle\Listeners\ConsoleEventsSubscriber;
 use Inspector\Symfony\Bundle\Listeners\KernelEventsSubscriber;
 use Symfony\Component\Config\FileLocator;
@@ -16,9 +15,11 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class InspectorExtension extends Extension
 {
-    /**
-     * @inheritDoc
-     */
+    protected const IGNORED_ROUTES = ['_wdt', '_profiler', '_profiler_home', '_profiler_search', '_profiler_search_bar',
+        '_profiler_phpinfo', '_profiler_search_results', '_profiler_open_file', '_profiler_router',
+        '_profiler_exception', '_profiler_exception_css',
+    ];
+
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = $this->getConfiguration($configs, $container);
@@ -46,12 +47,17 @@ class InspectorExtension extends Extension
 
         $container->setDefinition('inspector', $inspectorDefinition);
 
+        $config['ignore_routes'] = array_merge(
+            $config['ignore_routes'],
+            self::IGNORED_ROUTES
+        );
+
         // Kernel events subscriber: request, response etc.
         $kernelEventsSubscriberDefinition = new Definition(KernelEventsSubscriber::class, [
             new Reference('inspector'),
             new Reference('router'),
             new Reference('security.helper'),
-            $config['ignore_urls']
+            $config['ignore_routes']
         ]);
         $kernelEventsSubscriberDefinition->setPublic(false)->addTag('kernel.event_subscriber');
 
