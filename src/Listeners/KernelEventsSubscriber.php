@@ -31,7 +31,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     protected const SEGMENT_TYPE_TEMPLATE = 'template';
 
     /** @var string[] */
-    protected $ignoredUrls = [];
+    protected $ignoredRoutes = [];
 
     /** @var string */
     protected $routeName;
@@ -46,12 +46,12 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         Inspector $inspector,
         RouterInterface $router,
         Security $security,
-        array $ignoredUrls
+        array $ignoredRoutes
     ) {
         $this->inspector = $inspector;
         $this->router = $router;
         $this->security = $security;
-        $this->ignoredUrls = $ignoredUrls;
+        $this->ignoredRoutes = $ignoredRoutes;
     }
 
     /**
@@ -263,6 +263,6 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     {
         $route = $event->getRequest()->attributes->get('_route') ?: $this->routeName;
 
-        return $event->isMasterRequest() && !in_array($route, $this->ignoredUrls);
+        return $event->isMasterRequest() && !in_array($route, $this->ignoredRoutes);
     }
 }

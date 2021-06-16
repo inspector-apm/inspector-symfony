@@ -120,9 +120,6 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
 
     protected function isIgnored(Command $command): bool
     {
-        return in_array($command->getName(), $this->ignoredCommands)
-            || 0 === strpos($command->getName(), 'debug:')
-            || 0 === strpos($command->getName(), 'make:')
-            ;
+        return in_array($command->getName(), $this->ignoredCommands);
     }
 }
