@@ -17,10 +17,14 @@ class InspectableSQLLogger implements SQLLogger
     /** @var array */
     protected $configuration;
 
-    public function __construct(Inspector $inspector, array $configuration)
+    /** @var string */
+    protected $connectionName;
+
+    public function __construct(Inspector $inspector, array $configuration, string $connectionName)
     {
         $this->inspector = $inspector;
         $this->configuration = $configuration;
+        $this->connectionName = $connectionName;
     }
 
     /**
@@ -32,8 +36,7 @@ class InspectableSQLLogger implements SQLLogger
      */
     public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
-        // TODO: connection name
-        $this->segment = $this->inspector->startSegment('SQL', substr($sql, 0, 50));
+        $this->segment = $this->inspector->startSegment("doctrine:".$this->connectionName, substr($sql, 0, 50));
 
         $context = ['sql' => $sql];
 
