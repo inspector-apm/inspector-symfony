@@ -3,6 +3,7 @@ composer.lock
 composer-test.lock
 phpunit.xml
 phpunit.xml.dist
+/var/
 vendor/
 build/artifacts/
 artifacts/
@@ -13,3 +14,4 @@ docs/*.pyc
 .phpunit.result.cache
 /tests/cache
 /tests/cache*
+
