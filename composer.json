@@ -25,6 +25,7 @@
 	},
     "require-dev": {
         "doctrine/doctrine-bundle": "^2.4",
+        "symfony/framework-bundle": "^5.3.2",
         "phpunit/phpunit": "^9.5",
         "symfony/test-pack": "^1.0"
     },
