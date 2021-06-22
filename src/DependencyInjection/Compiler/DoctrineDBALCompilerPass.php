@@ -30,6 +30,10 @@ class DoctrineDBALCompilerPass implements CompilerPassInterface
             return;
         }
 
+        if (!$container->hasDefinition('doctrine') || !$container->hasDefinition('doctrine.dbal.logger.chain')) {
+            return;
+        }
+
         $chainLogger = $container->getDefinition('doctrine.dbal.logger.chain');
 
         /** @var array<string, string> $connections */
