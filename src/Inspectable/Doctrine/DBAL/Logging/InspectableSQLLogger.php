@@ -36,7 +36,7 @@ class InspectableSQLLogger implements SQLLogger
      */
     public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
-        $this->segment = $this->inspector->startSegment('Doctrine: '.$this->connectionName, substr($sql, 0, 50));
+        $this->segment = $this->inspector->startSegment("doctrine:".$this->connectionName, substr($sql, 0, 50));
 
         $context = ['sql' => $sql];
 
