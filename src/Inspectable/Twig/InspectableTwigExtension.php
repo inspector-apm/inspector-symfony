@@ -58,7 +58,7 @@ final class InspectableTwigExtension extends AbstractExtension
             return;
         }
 
-        $this->segments[$profile]->finish();
+        $this->segments[$profile]->end();
 
         unset($this->segments[$profile]);
     }
