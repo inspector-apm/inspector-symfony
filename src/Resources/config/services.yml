@@ -11,8 +11,3 @@ services:
         tags:
             - { name: 'console.command', command: 'inspector:pulse' }
 
-    Inspector\Symfony\Bundle\Inspectable\Twig\InspectableTwigExtension:
-        arguments:
-          [ '@inspector' ]
-        tags:
-            - { name: twig.extension }

@@ -22,6 +22,7 @@ class Configuration implements ConfigurationInterface
             ->booleanNode('unhandled_exceptions')->defaultTrue()->end()
             ->booleanNode('query')->defaultTrue()->end()
             ->booleanNode('query_bindings')->defaultFalse()->end()
+            ->booleanNode('templates')->defaultTrue()->end()
             ->booleanNode('user')->defaultTrue()->end()
             ->scalarNode('transport')->defaultValue('async')->end()
             ->floatNode('server_sampling_ratio')->defaultValue(0)->end()
