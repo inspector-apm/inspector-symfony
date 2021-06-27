@@ -9,11 +9,10 @@ use Inspector\Models\Segment;
 use Twig\Extension\AbstractExtension;
 use Twig\Profiler\NodeVisitor\ProfilerNodeVisitor;
 use Twig\Profiler\Profile;
-use SplObjectStorage;
 
 final class InspectableTwigExtension extends AbstractExtension
 {
-    const SEGMENT_TYPE = 'twig';
+    protected const SEGMENT_TYPE = 'twig';
 
     /**
      * @var Inspector
@@ -21,14 +20,13 @@ final class InspectableTwigExtension extends AbstractExtension
     protected $inspector;
 
     /**
-     * @var SplObjectStorage<object, Segment> The currently active spans
+     * @var Segment[]
      */
-    private $segments;
+    protected $segments = [];
 
     public function __construct(Inspector $inspector)
     {
         $this->inspector = $inspector;
-        $this->segments = new SplObjectStorage();
     }
 
     /**
@@ -43,7 +41,13 @@ final class InspectableTwigExtension extends AbstractExtension
             return;
         }
 
-        $this->segments[$profile] = $this->inspector->startSegment(self::SEGMENT_TYPE, $this->getSpanDescription($profile));
+        $profile->enter();
+
+        $label = $this->getLabelTitle($profile);
+
+        if ($profile->isRoot() || $profile->isTemplate()) {
+            $this->segments[$profile->getTemplate()] = $this->inspector->startSegment(self::SEGMENT_TYPE, $label);
+        }
     }
 
     /**
@@ -54,13 +58,26 @@ final class InspectableTwigExtension extends AbstractExtension
      */
     public function leave(Profile $profile): void
     {
-        if (!isset($this->segments[$profile])) {
+        $profile->leave();
+
+        if (!isset($this->segments[$profile->getTemplate()])) {
             return;
         }
 
-        $this->segments[$profile]->end();
+        $label = $this->getLabelTitle($profile);
 
-        unset($this->segments[$profile]);
+        $this->segments[$profile->getTemplate()]->addContext($label, [
+            'template' => $profile->getTemplate(),
+            'type' => $profile->getType(),
+            'name' => $profile->getName(),
+            'duration' => $profile->getDuration(),
+            'memory_usage' => $profile->getMemoryUsage(),
+            'peak_memory_usage' => $profile->getPeakMemoryUsage(),
+        ]);
+
+        $this->segments[$profile->getTemplate()]->end();
+
+        unset($this->segments[$label]);
     }
 
     /**
@@ -68,9 +85,7 @@ final class InspectableTwigExtension extends AbstractExtension
      */
     public function getNodeVisitors(): array
     {
-        return [
-            new ProfilerNodeVisitor(self::class),
-        ];
+        return [new ProfilerNodeVisitor(self::class)];
     }
 
     /**
@@ -78,7 +93,7 @@ final class InspectableTwigExtension extends AbstractExtension
      *
      * @param Profile $profile The profiling data
      */
-    private function getSpanDescription(Profile $profile): string
+    private function getLabelTitle(Profile $profile): string
     {
         switch (true) {
             case $profile->isRoot():
