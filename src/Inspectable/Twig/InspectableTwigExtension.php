@@ -12,8 +12,6 @@ use Twig\Profiler\Profile;
 
 final class InspectableTwigExtension extends AbstractExtension
 {
-    protected const SEGMENT_TYPE = 'twig';
-
     /**
      * @var Inspector
      */
@@ -46,7 +44,7 @@ final class InspectableTwigExtension extends AbstractExtension
         $label = $this->getLabelTitle($profile);
 
         if ($profile->isRoot() || $profile->isTemplate()) {
-            $this->segments[$profile->getTemplate()] = $this->inspector->startSegment(self::SEGMENT_TYPE, $label);
+            $this->segments[$profile->getTemplate()] = $this->inspector->startSegment('twig', $label);
         }
     }
 
