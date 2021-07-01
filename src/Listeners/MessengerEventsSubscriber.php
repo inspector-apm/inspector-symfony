@@ -4,11 +4,12 @@
 namespace Inspector\Symfony\Bundle\Listeners;
 
 use Inspector\Inspector;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 
-class MessengerEventsSubscriber
+class MessengerEventsSubscriber implements EventSubscriberInterface
 {
     use InspectorAwareTrait;
 

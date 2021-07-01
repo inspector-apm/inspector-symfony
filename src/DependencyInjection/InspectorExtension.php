@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class InspectorExtension extends Extension
 {
@@ -66,7 +67,7 @@ class InspectorExtension extends Extension
 
         $container->setDefinition(KernelEventsSubscriber::class, $kernelEventsSubscriberDefinition);
 
-        if (class_exists('Symfony\Component\Messenger\MessageBusInterface') && $config['messenger']) {
+        if (interface_exists(MessageBusInterface::class) && true === $config['messenger']) {
             // Messenger events subscriber
             $messengerEventsSubscriber = new Definition(MessengerEventsSubscriber::class, [
                 new Reference('inspector')
