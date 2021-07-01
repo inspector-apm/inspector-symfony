@@ -3,10 +3,12 @@ inspector:
     url: https://ingest.inspector.dev
     enabled: true
     unhandled_exceptions: true
+    messenger: true
     query: true
     query_bindings: false
     templates: true
     user: true
+    templates: true
     transport: async
     server_sampling_ratio: 0
     ignore_routes:

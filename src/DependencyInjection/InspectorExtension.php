@@ -66,13 +66,15 @@ class InspectorExtension extends Extension
 
         $container->setDefinition(KernelEventsSubscriber::class, $kernelEventsSubscriberDefinition);
 
-        // Messenger events subscriber
-        $messengerEventsSubscriber = new Definition(MessengerEventsSubscriber::class, [
-            new Reference('inspector')
-        ]);
-        $messengerEventsSubscriber->setPublic(false)->addTag('kernel.event_subscriber');
+        if (class_exists('Symfony\Component\Messenger\MessageBusInterface') && $config['messenger']) {
+            // Messenger events subscriber
+            $messengerEventsSubscriber = new Definition(MessengerEventsSubscriber::class, [
+                new Reference('inspector')
+            ]);
+            $messengerEventsSubscriber->setPublic(false)->addTag('kernel.event_subscriber');
 
-        $container->setDefinition(KernelEventsSubscriber::class, $kernelEventsSubscriberDefinition);
+            $container->setDefinition(MessengerEventsSubscriber::class, $messengerEventsSubscriber);
+        }
 
         // Console events subscriber
         $consoleEventsSubscriberDefinition = new Definition(ConsoleEventsSubscriber::class, [
