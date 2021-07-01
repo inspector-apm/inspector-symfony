@@ -7,6 +7,7 @@ use Inspector\Inspector;
 use Inspector\Symfony\Bundle\Inspectable\Twig\InspectableTwigExtension;
 use Inspector\Symfony\Bundle\Listeners\ConsoleEventsSubscriber;
 use Inspector\Symfony\Bundle\Listeners\KernelEventsSubscriber;
+use Inspector\Symfony\Bundle\Listeners\MessengerEventsSubscriber;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -62,6 +63,14 @@ class InspectorExtension extends Extension
             $config['ignore_routes']
         ]);
         $kernelEventsSubscriberDefinition->setPublic(false)->addTag('kernel.event_subscriber');
+
+        $container->setDefinition(KernelEventsSubscriber::class, $kernelEventsSubscriberDefinition);
+
+        // Messenger events subscriber
+        $messengerEventsSubscriber = new Definition(MessengerEventsSubscriber::class, [
+            new Reference('inspector')
+        ]);
+        $messengerEventsSubscriber->setPublic(false)->addTag('kernel.event_subscriber');
 
         $container->setDefinition(KernelEventsSubscriber::class, $kernelEventsSubscriberDefinition);
 

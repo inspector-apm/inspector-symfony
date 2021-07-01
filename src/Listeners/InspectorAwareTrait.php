@@ -21,6 +21,22 @@ trait InspectorAwareTrait
     protected $segments = [];
 
     /**
+     * Checks if segments can be added
+     */
+    protected function canAddSegments(): bool
+    {
+        return $this->inspector->canAddSegments();
+    }
+
+    /**
+     * Checks if transaction is needed
+     */
+    protected function needsTransaction(): bool
+    {
+        return $this->inspector->needTransaction();
+    }
+
+    /**
      * Be sure to start a transaction before report the exception.
      *
      * @throws \Exception
