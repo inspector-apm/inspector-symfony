@@ -22,7 +22,7 @@ class InspectorExtension extends Extension
 
         $container->setParameter('inspector.configuration', $config);
 
-        if(true !== $config['enabled']) {
+        if(true !== $config['enabled'] || empty($config['ingestion_key'])) {
             return;
         }
 

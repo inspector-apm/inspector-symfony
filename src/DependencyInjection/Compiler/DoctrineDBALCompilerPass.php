@@ -3,16 +3,16 @@
 namespace Inspector\Symfony\Bundle\DependencyInjection\Compiler;
 
 /** Compatibility with doctrine/dbal < 2.10.0 */
+
 use Doctrine\DBAL\Logging\LoggerChain;
 use Doctrine\DBAL\SQLParserUtils;
-/** End compatibility with doctrine/dbal < 2.10.0 */
-
 use Inspector\Symfony\Bundle\Inspectable\Doctrine\DBAL\Logging\InspectableSQLLogger;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
+/** End compatibility with doctrine/dbal < 2.10.0 */
 class DoctrineDBALCompilerPass implements CompilerPassInterface
 {
     /**
@@ -22,11 +22,7 @@ class DoctrineDBALCompilerPass implements CompilerPassInterface
     {
         $config = $container->getParameter('inspector.configuration');
 
-        if (true !== $config['enabled']) {
-            return;
-        }
-
-        if (true !== $config['query']) {
+        if (true !== $config['enabled'] || true !== $config['query'] || empty($config['ingestion_key'])) {
             return;
         }
 
