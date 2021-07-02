@@ -5,6 +5,7 @@ inspector:
     unhandled_exceptions: true
     query: true
     query_bindings: false
+    templates: true
     user: true
     transport: async
     server_sampling_ratio: 0

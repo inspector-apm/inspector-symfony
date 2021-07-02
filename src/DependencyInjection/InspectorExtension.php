@@ -4,6 +4,7 @@
 namespace Inspector\Symfony\Bundle\DependencyInjection;
 
 use Inspector\Inspector;
+use Inspector\Symfony\Bundle\Inspectable\Twig\InspectableTwigExtension;
 use Inspector\Symfony\Bundle\Listeners\ConsoleEventsSubscriber;
 use Inspector\Symfony\Bundle\Listeners\KernelEventsSubscriber;
 use Symfony\Component\Config\FileLocator;
@@ -61,6 +62,15 @@ class InspectorExtension extends Extension
         $consoleEventsSubscriberDefinition->setPublic(false)->addTag('kernel.event_subscriber');
 
         $container->setDefinition(ConsoleEventsSubscriber::class, $consoleEventsSubscriberDefinition);
+
+        if (true === $config['templates']) {
+            $inspectableTwigExtensionDefinition = new Definition(InspectableTwigExtension::class, [
+                new Reference('inspector'),
+            ]);
+            $inspectableTwigExtensionDefinition->addTag('twig.extension');
+
+            $container->setDefinition(InspectableTwigExtension::class, $inspectableTwigExtensionDefinition);
+        }
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
