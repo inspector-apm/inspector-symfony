@@ -18,18 +18,18 @@
     "require": {
 		"php": ">=7.2.5",
 		"inspector-apm/inspector-php": "^3.6",
-        "symfony/config": "^5.2",
-        "symfony/dependency-injection": "^5.2",
-        "symfony/http-kernel": "^5.2",
-        "symfony/event-dispatcher": "^5.2",
-        "symfony/console": "^5.2",
-        "symfony/framework-bundle": "^5.2",
-        "symfony/yaml": "^5.2",
-        "symfony/security-bundle": "^5.2"
+        "symfony/config": "^4.4|^5.2",
+        "symfony/dependency-injection": "^4.4|^5.2",
+        "symfony/http-kernel": "^4.4|^5.2",
+        "symfony/event-dispatcher": "^4.4|^5.2",
+        "symfony/console": "^4.4|^5.2",
+        "symfony/framework-bundle": "^4.4|^5.2",
+        "symfony/yaml": "^4.4|^5.2",
+        "symfony/security-bundle": "^4.4|^5.2"
 	},
     "require-dev": {
         "doctrine/doctrine-bundle": "^2.4",
-        "symfony/framework-bundle": "^5.3.2",
+        "symfony/framework-bundle": "^4.4|^5.2",
         "phpunit/phpunit": "^9.5",
         "symfony/test-pack": "^1.0"
     },

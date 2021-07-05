@@ -42,8 +42,11 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
             ConsoleEvents::COMMAND => ['onConsoleStart', 9999],
             ConsoleEvents::ERROR => ['onConsoleError', 128],
             ConsoleEvents::TERMINATE => ['onConsoleTerminate', 0],
-            ConsoleEvents::SIGNAL => ['onConsoleSignal', 0],
         ];
+
+        if (defined('Symfony\Component\Console::CONSOLE_SIGNAL')) {
+            $listeners[ConsoleEvents::SIGNAL] = ['onConsoleSignal', 0];
+        }
 
         return $listeners;
     }
