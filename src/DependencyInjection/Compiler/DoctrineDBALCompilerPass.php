@@ -7,6 +7,7 @@ namespace Inspector\Symfony\Bundle\DependencyInjection\Compiler;
 use Doctrine\DBAL\Logging\LoggerChain;
 use Doctrine\DBAL\SQLParserUtils;
 use Inspector\Symfony\Bundle\Inspectable\Doctrine\DBAL\Logging\InspectableSQLLogger;
+use OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -51,9 +52,13 @@ class DoctrineDBALCompilerPass implements CompilerPassInterface
                 // doctrine/dbal < 2.10.0
                 $chainLogger->addMethodCall('addLogger', [$logger]);
             } else {
-                $loggers = $chainLogger->getArgument(0);
-                array_push($loggers, $logger);
-                $chainLogger->replaceArgument(0, $loggers);
+                try {
+                    $loggers = $chainLogger->getArgument(0);
+                    array_push($loggers, $logger);
+                    $chainLogger->replaceArgument(0, $loggers);
+                } catch (OutOfBoundsException $exception) {
+                    $chainLogger->addArgument([$logger]);
+                }
             }
 
             $container->getDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $name))->addMethodCall('setSQLLogger', [$logger]);
