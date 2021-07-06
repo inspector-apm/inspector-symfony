@@ -10,10 +10,14 @@ use Throwable;
 
 trait InspectorAwareTrait
 {
-    /** @var Inspector */
+    /**
+     * @var Inspector
+     */
     protected $inspector;
 
-    /** @var Segment[] */
+    /**
+     * @var Segment[]
+     */
     protected $segments = [];
 
     /**
@@ -49,6 +53,11 @@ trait InspectorAwareTrait
         return $segment;
     }
 
+    /**
+     * Terminate the segment.
+     *
+     * @param string $label
+     */
     protected function endSegment(string $label): void
     {
         if (!isset($this->segments[$label])) {

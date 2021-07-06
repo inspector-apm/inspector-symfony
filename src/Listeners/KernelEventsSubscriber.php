@@ -30,18 +30,34 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     protected const SEGMENT_TYPE_PROCESS = 'process';
     protected const SEGMENT_TYPE_TEMPLATE = 'template';
 
-    /** @var string[] */
+    /**
+     * @var string[]
+     */
     protected $ignoredRoutes = [];
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $routeName;
 
-    /** @var RouterInterface  */
+    /**
+     * @var RouterInterface
+     */
     protected $router;
 
-    /** @var Security */
+    /**
+     * @var Security
+     */
     protected $security;
 
+    /**
+     * KernelEventsSubscriber constructor.
+     *
+     * @param Inspector $inspector
+     * @param RouterInterface $router
+     * @param Security $security
+     * @param array $ignoredRoutes
+     */
     public function __construct(
         Inspector $inspector,
         RouterInterface $router,

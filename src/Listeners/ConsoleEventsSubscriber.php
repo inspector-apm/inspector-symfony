@@ -15,11 +15,14 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
 {
     use InspectorAwareTrait;
 
-    /** @var string[] command names */
+    /**
+     * @var string[] command names
+     */
     protected $ignoredCommands;
 
     /**
      * ConsoleEventsSubscriber constructor.
+     *
      * @param Inspector $inspector
      * @param string[] $ignoredCommands command names
      */

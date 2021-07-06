@@ -9,12 +9,30 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class InspectorPulseCommand extends Command
 {
+    /**
+     * The default command name.
+     *
+     * @var string|null
+     */
     protected static $defaultName = 'inspector:pulse';
+
+    /**
+     * The default command description.
+     *
+     * @var string|null
+     */
     protected static $defaultDescription = 'Collect server resources consumption.';
 
-    /**  @var Inspector */
+    /**
+     * @var Inspector
+     */
     protected $inspector;
 
+    /**
+     * InspectorPulseCommand constructor.
+     *
+     * @param Inspector $inspector
+     */
     public function __construct(Inspector $inspector)
     {
         parent::__construct();
@@ -22,6 +40,9 @@ class InspectorPulseCommand extends Command
         $this->inspector = $inspector;
     }
 
+    /**
+     * Configures the current command.
+     */
     protected function configure(): void
     {
         $this
@@ -30,6 +51,13 @@ class InspectorPulseCommand extends Command
         ;
     }
 
+    /**
+     * Execute the command.
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this->inspector->hasTransaction() && $this->inspector->isRecording()) {

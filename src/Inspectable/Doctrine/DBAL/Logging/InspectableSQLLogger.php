@@ -20,6 +20,13 @@ class InspectableSQLLogger implements SQLLogger
     /** @var string */
     protected $connectionName;
 
+    /**
+     * InspectableSQLLogger constructor.
+     *
+     * @param Inspector $inspector
+     * @param array $configuration
+     * @param string $connectionName
+     */
     public function __construct(Inspector $inspector, array $configuration, string $connectionName)
     {
         $this->inspector = $inspector;

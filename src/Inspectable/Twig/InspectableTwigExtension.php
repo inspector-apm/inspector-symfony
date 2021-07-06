@@ -22,6 +22,11 @@ final class InspectableTwigExtension extends AbstractExtension
      */
     protected $segments = [];
 
+    /**
+     * InspectableTwigExtension constructor.
+     *
+     * @param Inspector $inspector
+     */
     public function __construct(Inspector $inspector)
     {
         $this->inspector = $inspector;

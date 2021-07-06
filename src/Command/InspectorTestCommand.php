@@ -12,18 +12,42 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class InspectorTestCommand extends Command
 {
+    /**
+     * The default command name.
+     *
+     * @var string|null
+     */
     protected static $defaultName = 'inspector:test';
+
+    /**
+     * The default command description.
+     *
+     * @var string|null
+     */
     protected static $defaultDescription = 'Send data to your Inspector dashboard.';
 
-    /**  @var Inspector */
+    /**
+     * @var Inspector
+     */
     protected $inspector;
 
-    /** @var LoggerInterface */
+    /**
+     * @var LoggerInterface
+     */
     protected $logger;
 
-    /** @var \Inspector\Configuration */
+    /**
+     * @var \Inspector\Configuration
+     */
     protected $configuration;
 
+    /**
+     * InspectorTestCommand constructor.
+     *
+     * @param Inspector $inspector
+     * @param LoggerInterface $logger
+     * @param Configuration $configuration
+     */
     public function __construct(Inspector $inspector, LoggerInterface $logger, Configuration $configuration)
     {
         parent::__construct();
@@ -33,6 +57,9 @@ class InspectorTestCommand extends Command
         $this->configuration = $configuration;
     }
 
+    /**
+     * Configures the current command.
+     */
     protected function configure(): void
     {
         $this
@@ -41,6 +68,14 @@ class InspectorTestCommand extends Command
         ;
     }
 
+    /**
+     * Execute the command.
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws \Throwable
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
