@@ -16,6 +16,16 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class InspectorExtension extends Extension
 {
+    /**
+     * Current version of the bundle.
+     */
+    const VERSION = '1.0.2';
+
+    /**
+     * Loads a specific configuration.
+     *
+     * @throws \InvalidArgumentException|\Exception When provided tag is not defined in this extension
+     */
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = $this->getConfiguration($configs, $container);
@@ -34,6 +44,7 @@ class InspectorExtension extends Extension
         $inspectorConfigDefinition->addMethodCall('setUrl', [$config['url']]);
         $inspectorConfigDefinition->addMethodCall('setTransport', [$config['transport']]);
         $inspectorConfigDefinition->addMethodCall('serverSamplingRatio', [$config['server_sampling_ratio']]);
+        $inspectorConfigDefinition->addMethodCall('setVersion', [self::VERSION]);
 
         $container->setDefinition('inspector.configuration.internal', $inspectorConfigDefinition);
 
