@@ -23,6 +23,8 @@ inspector:
         - '_profiler_exception'
         - '_profiler_exception_css'
     ignore_commands:
+        - 'messenger:consume'
+        # Development commands section
         - 'debug:autowiring'
         - 'debug:config'
         - 'debug:container'

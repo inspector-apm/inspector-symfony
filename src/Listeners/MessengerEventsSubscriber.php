@@ -22,6 +22,11 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
         $this->inspector = $inspector;
     }
 
+    /**
+     * @uses onWorkerMessageReceived
+     * @uses onWorkerMessageFailed
+     * @uses onWorkerMessageHandled
+     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -33,14 +38,14 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
 
     public function onWorkerMessageReceived(WorkerMessageReceivedEvent $event)
     {
-        if ($this->inspector->needTransaction()) {
-            $this->inspector->startTransaction($event->getReceiverName())
+        if ($this->needsTransaction()) {
+            $this->startTransaction($event->getReceiverName())
                 ->addContext('worker', [
                     'message' => serialize($event->getEnvelope()->getMessage()),
                     'stamps' => serialize($event->getEnvelope()->all()),
                 ]);
-        } elseif ($this->inspector->canAddSegments()) {
-            $this->segments[$event->getReceiverName()] = $this->inspector->startSegment('worker', $event->getReceiverName());
+        } elseif ($this->canAddSegments()) {
+            $this->startSegment('worker', $event->getReceiverName());
         }
     }
 
@@ -50,6 +55,7 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
 
         if($this->inspector->hasTransaction() && $this->inspector->currentTransaction()->name === $event->getReceiverName()) {
             $this->inspector->currentTransaction()->setResult('error');
+            $this->inspector->flush();
         } elseif(array_key_exists($event->getReceiverName(), $this->segments)) {
             $this->segments[$event->getReceiverName()]->end()->addContext('worker', [
                 'message' => serialize($event->getEnvelope()->getMessage()),
@@ -60,6 +66,7 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
 
     public function onWorkerMessageHandled(WorkerMessageHandledEvent $event)
     {
-        $this->segments[$event->getReceiverName()]->end();
+        $this->endSegment($event->getReceiverName());
+        $this->inspector->flush();
     }
 }
