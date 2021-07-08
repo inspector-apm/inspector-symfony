@@ -8,6 +8,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 class MessengerEventsSubscriber implements EventSubscriberInterface
 {
@@ -38,35 +39,30 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
 
     public function onWorkerMessageReceived(WorkerMessageReceivedEvent $event)
     {
-        if ($this->needsTransaction()) {
-            $this->startTransaction($event->getReceiverName())
-                ->addContext('worker', [
-                    'message' => serialize($event->getEnvelope()->getMessage()),
-                    'stamps' => serialize($event->getEnvelope()->all()),
-                ]);
-        } elseif ($this->canAddSegments()) {
-            $this->startSegment('worker', $event->getReceiverName());
-        }
+        $this->startTransaction(get_class($event->getEnvelope()->getMessage()));
     }
 
     public function onWorkerMessageFailed(WorkerMessageFailedEvent $event)
     {
         $this->notifyUnexpectedError($event->getThrowable());
 
-        if($this->inspector->hasTransaction() && $this->inspector->currentTransaction()->name === $event->getReceiverName()) {
+        if ($this->inspector->hasTransaction()) {
             $this->inspector->currentTransaction()->setResult('error');
             $this->inspector->flush();
-        } elseif(array_key_exists($event->getReceiverName(), $this->segments)) {
-            $this->segments[$event->getReceiverName()]->end()->addContext('worker', [
-                'message' => serialize($event->getEnvelope()->getMessage()),
-                'stamps' => serialize($event->getEnvelope()->all()),
-            ]);
         }
     }
 
     public function onWorkerMessageHandled(WorkerMessageHandledEvent $event)
     {
-        $this->endSegment($event->getReceiverName());
+        $processedByStamps = $event->getEnvelope()->all(HandledStamp::class);
+        $processedBy = [];
+        /** @var HandledStamp $handlerStamp */
+        foreach ($processedByStamps as $handlerStamp) {
+            $processedBy = $handlerStamp->getHandlerName();
+        }
+        $this->inspector->currentTransaction()->addContext('Handled By', $processedBy);
+        $this->inspector->currentTransaction()->addContext('Envelope', serialize($event->getEnvelope()));
+
         $this->inspector->flush();
     }
 }
