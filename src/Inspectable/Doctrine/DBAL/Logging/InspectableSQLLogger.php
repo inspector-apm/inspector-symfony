@@ -43,6 +43,11 @@ class InspectableSQLLogger implements SQLLogger
      */
     public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
+        // This check is needed as transaction is flushed in MessengerEventSubscriber
+        if (!$this->inspector->hasTransaction()) {
+            return;
+        }
+
         $this->segment = $this->inspector->startSegment("doctrine:".$this->connectionName, substr($sql, 0, 50));
 
         $context = ['sql' => $sql];
@@ -60,6 +65,11 @@ class InspectableSQLLogger implements SQLLogger
      */
     public function stopQuery(): void
     {
+        // This check is needed as transaction is flushed in MessengerEventSubscriber
+        if (!$this->inspector->hasTransaction()) {
+            return;
+        }
+
         if (null === $this->segment) {
             throw new \LogicException('Attempt to stop a segment that has not been started');
         }
