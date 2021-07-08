@@ -6,7 +6,6 @@ inspector:
     messenger: true
     query: true
     query_bindings: false
-    templates: true
     user: true
     templates: true
     transport: async
