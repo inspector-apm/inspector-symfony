@@ -7,6 +7,7 @@ use Inspector\Inspector;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 class MessengerEventsSubscriber implements EventSubscriberInterface
@@ -34,6 +35,7 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
+            WorkerMessageReceivedEvent::class => 'onWorkerMessageReceived',
             WorkerMessageFailedEvent::class => 'onWorkerMessageFailed',
             WorkerMessageHandledEvent::class => 'onWorkerMessageHandled',
         ];
@@ -74,5 +76,10 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
             ->addContext('Envelope', \serialize($event->getEnvelope()));
 
         $this->inspector->flush();
+    }
+
+    public function onWorkerMessageReceived(WorkerMessageReceivedEvent $event)
+    {
+        $this->inspector->startTransaction(get_class($event->getEnvelope()->getMessage()));
     }
 }
