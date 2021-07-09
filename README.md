@@ -9,14 +9,14 @@
 
 ## Requirements
 
-- PHP >= 7.2.5
-- Symfony >= 5.2
+- PHP >= 7.2
+- Symfony ^4.4|^5.2
 
 <a name="install"></a>
 
 ## Install
 
-Install the latest version of our package by:
+Install the latest version of the bundle:
 
 ```
 composer require inspector-apm/inspector-symfony
@@ -42,4 +42,4 @@ You can obtain the `ingestion_key` creating a new project in your [Inspector](ht
 
 ## LICENSE
 
-This package are licensed under the [MIT](LICENSE) license.
+This bundle is licensed under the [MIT](LICENSE) license.
