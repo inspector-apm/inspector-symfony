@@ -1,13 +1,13 @@
 services:
     Inspector\Symfony\Bundle\Command\InspectorTestCommand:
         arguments:
-          [ '@inspector', '@logger', '@inspector.configuration.internal' ]
+          [ '@Inspector\Inspector', '@logger', '@Inspector\Configuration' ]
         tags:
             - { name: 'console.command', command: 'inspector:test' }
 
     Inspector\Symfony\Bundle\Command\InspectorPulseCommand:
         arguments:
-          [ '@inspector' ]
+          [ '@Inspector\Inspector' ]
         tags:
             - { name: 'console.command', command: 'inspector:pulse' }
 

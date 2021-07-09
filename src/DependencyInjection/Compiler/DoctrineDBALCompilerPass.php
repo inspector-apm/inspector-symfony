@@ -6,6 +6,7 @@ namespace Inspector\Symfony\Bundle\DependencyInjection\Compiler;
 
 use Doctrine\DBAL\Logging\LoggerChain;
 use Doctrine\DBAL\SQLParserUtils;
+use Inspector\Inspector;
 use Inspector\Symfony\Bundle\Inspectable\Doctrine\DBAL\Logging\InspectableSQLLogger;
 use OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -21,7 +22,7 @@ class DoctrineDBALCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $config = $container->getParameter('inspector.configuration');
+        $config = $container->getParameter('inspector.configuration.definition');
 
         if (true !== $config['enabled'] || true !== $config['query'] || empty($config['ingestion_key'])) {
             return;
@@ -38,7 +39,7 @@ class DoctrineDBALCompilerPass implements CompilerPassInterface
         foreach ($connections as $name => $service) {
             // SQL Logger for Doctrine DBAL to use in Inspector.dev
             $inspectableSqlLoggerDefinition = new Definition(InspectableSQLLogger::class, [
-                new Reference('inspector'),
+                new Reference(Inspector::class),
                 $config,
                 $name
             ]);
