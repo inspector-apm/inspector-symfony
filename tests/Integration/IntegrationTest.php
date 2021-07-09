@@ -20,7 +20,7 @@ class IntegrationTest extends KernelTestCase
     {
         self::bootKernel(['environment' => 'test', 'debug' => false]);
 
-        $inspectorService = static::getContainer()->get('inspector');
+        $inspectorService = static::getContainer()->get(Inspector::class);
 
         $this->assertFalse($inspectorService->hasTransaction());
     }
