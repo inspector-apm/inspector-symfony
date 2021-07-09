@@ -18,7 +18,7 @@ class IntegrationTest extends KernelTestCase
 
     public function testServiceWiringWithConfiguration()
     {
-        self::bootKernel(['environment' => 'test', 'debug' => false]);
+        self::bootKernel(['environment' => 'test']);
 
         $inspectorService = static::getContainer()->get(Inspector::class);
 
