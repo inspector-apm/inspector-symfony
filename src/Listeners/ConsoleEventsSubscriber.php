@@ -103,7 +103,7 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
         $commandName = $command->getName();
         if($this->inspector->hasTransaction() && $this->inspector->currentTransaction()->name === $commandName) {
             $this->inspector->currentTransaction()->setResult($event->getExitCode() === 0 ? 'success' : 'error');
-        } elseif(array_key_exists($commandName, $this->segments)) {
+        } elseif(\array_key_exists($commandName, $this->segments)) {
             $this->segments[$commandName]->end()->addContext('Command', [
                 'exit_code' => $event->getExitCode(),
                 'arguments' => $event->getInput()->getArguments(),
@@ -126,6 +126,6 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
 
     protected function isIgnored(Command $command): bool
     {
-        return in_array($command->getName(), $this->ignoredCommands);
+        return \in_array($command->getName(), $this->ignoredCommands);
     }
 }

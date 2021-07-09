@@ -85,7 +85,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         // The higher the priority number, the earlier the method is called.
-        $listeners = [
+        return [
             KernelEvents::CONTROLLER => ['onKernelController', 9999],
             KernelEvents::CONTROLLER_ARGUMENTS => [
                 ['onKernelPreControllerArguments', 9999],
@@ -98,8 +98,6 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             KernelEvents::VIEW => ['onKernelView', 9999],
             KernelEvents::TERMINATE => ['onKernelTerminate', -9999],
         ];
-
-        return $listeners;
     }
 
     public function onKernelController(ControllerEvent $event): void
@@ -136,9 +134,9 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $arguments = [];
         foreach ($event->getArguments() as $argument) {
-            if (is_object($argument)) {
-                $args = ['class' => get_class($argument)];
-                if (method_exists($argument, 'getId')) {
+            if (\is_object($argument)) {
+                $args = ['class' => \get_class($argument)];
+                if (\method_exists($argument, 'getId')) {
                     $args['id'] = $argument->getId();
                 }
                 $arguments[] = $args;
@@ -174,7 +172,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->startTransaction($event->getRequest()->getMethod() . ' /' . trim($this->routeName, '/'));
+        $this->startTransaction($event->getRequest()->getMethod() . ' /' . \trim($this->routeName, '/'));
         $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::REQUEST);
     }
 
@@ -240,11 +238,11 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         // The additional `method_exists` check is to prevent errors in Symfony 4.3
         // where the ExceptionEvent exists and is used but doesn't implement
         // the `getThrowable` method, which was introduced in Symfony 4.4
-        if ($event instanceof ExceptionEvent && method_exists($event, 'getThrowable')) {
+        if ($event instanceof ExceptionEvent && \method_exists($event, 'getThrowable')) {
             $this->startTransaction(get_class($event->getThrowable()))->setResult('error');
             $this->notifyUnexpectedError($event->getThrowable());
         } elseif ($event instanceof GetResponseForExceptionEvent) {
-            $this->startTransaction(get_class($event->getException()))->setResult('error');
+            $this->startTransaction(\get_class($event->getException()))->setResult('error');
             $this->notifyUnexpectedError($event->getException());
         } else {
             throw new \LogicException('Invalid exception event.');
@@ -281,6 +279,6 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     {
         $route = $event->getRequest()->attributes->get('_route') ?: $this->routeName;
 
-        return $event->isMasterRequest() && !in_array($route, $this->ignoredRoutes);
+        return $event->isMasterRequest() && !\in_array($route, $this->ignoredRoutes);
     }
 }

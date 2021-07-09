@@ -70,7 +70,7 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
 
         $this->inspector->currentTransaction()
             ->addContext('Handlers', $processedBy)
-            ->addContext('Envelope', serialize($event->getEnvelope()));
+            ->addContext('Envelope', \serialize($event->getEnvelope()));
 
         $this->inspector->flush();
     }
