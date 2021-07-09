@@ -7,12 +7,14 @@ use Inspector\Inspector;
 use Inspector\Symfony\Bundle\Inspectable\Twig\InspectableTwigExtension;
 use Inspector\Symfony\Bundle\Listeners\ConsoleEventsSubscriber;
 use Inspector\Symfony\Bundle\Listeners\KernelEventsSubscriber;
+use Inspector\Symfony\Bundle\Listeners\MessengerEventsSubscriber;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class InspectorExtension extends Extension
 {
@@ -64,6 +66,16 @@ class InspectorExtension extends Extension
         $kernelEventsSubscriberDefinition->setPublic(false)->addTag('kernel.event_subscriber');
 
         $container->setDefinition(KernelEventsSubscriber::class, $kernelEventsSubscriberDefinition);
+
+        if (interface_exists(MessageBusInterface::class) && true === $config['messenger']) {
+            // Messenger events subscriber
+            $messengerEventsSubscriber = new Definition(MessengerEventsSubscriber::class, [
+                new Reference('inspector')
+            ]);
+            $messengerEventsSubscriber->setPublic(false)->addTag('kernel.event_subscriber');
+
+            $container->setDefinition(MessengerEventsSubscriber::class, $messengerEventsSubscriber);
+        }
 
         // Console events subscriber
         $consoleEventsSubscriberDefinition = new Definition(ConsoleEventsSubscriber::class, [

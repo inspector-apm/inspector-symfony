@@ -20,6 +20,7 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('url')->defaultValue('https://ingest.inspector.dev')->end()
             ->scalarNode('ingestion_key')->defaultNull()->end()
             ->booleanNode('unhandled_exceptions')->defaultTrue()->end()
+            ->booleanNode('messenger')->defaultTrue()->end()
             ->booleanNode('query')->defaultTrue()->end()
             ->booleanNode('query_bindings')->defaultFalse()->end()
             ->booleanNode('templates')->defaultTrue()->end()
