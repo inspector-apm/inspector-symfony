@@ -11,7 +11,7 @@ class IntegrationTest extends KernelTestCase
     {
         self::bootKernel();
 
-        $inspectorService = static::getContainer()->get('inspector');
+        $inspectorService = static::getContainer()->get(Inspector::class);
 
         $this->assertInstanceOf(Inspector::class, $inspectorService);
     }

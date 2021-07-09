@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Security;
 
 class InspectorExtension extends Extension
 {
@@ -32,7 +34,7 @@ class InspectorExtension extends Extension
     {
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
-        $container->setParameter('inspector.configuration', $config);
+        $container->setParameter('inspector.configuration.definition', $config);
 
         if(true !== $config['enabled'] || empty($config['ingestion_key'])) {
             return;
@@ -49,22 +51,22 @@ class InspectorExtension extends Extension
         $inspectorConfigDefinition->addMethodCall('serverSamplingRatio', [$config['server_sampling_ratio']]);
         $inspectorConfigDefinition->addMethodCall('setVersion', [self::VERSION]);
 
-        $container->setDefinition('inspector.configuration.internal', $inspectorConfigDefinition);
+        $container->setDefinition(\Inspector\Configuration::class, $inspectorConfigDefinition);
 
         /*
          * Inspector service itself
          */
         $inspectorDefinition = new Definition(Inspector::class, [$inspectorConfigDefinition]);
         $inspectorDefinition->setPublic(true);
-        $container->setDefinition('inspector', $inspectorDefinition);
+        $container->setDefinition(Inspector::class, $inspectorDefinition);
 
         /*
          * Kernel events subscriber: request, response etc.
          */
         $kernelEventsSubscriberDefinition = new Definition(KernelEventsSubscriber::class, [
-            new Reference('inspector'),
-            new Reference('router'),
-            new Reference('security.helper'),
+            new Reference(Inspector::class),
+            new Reference(RouterInterface::class),
+            new Reference(Security::class),
             $config['ignore_routes']
         ]);
         $kernelEventsSubscriberDefinition->setPublic(false)->addTag('kernel.event_subscriber');
@@ -75,7 +77,7 @@ class InspectorExtension extends Extension
          */
         if (interface_exists(MessageBusInterface::class) && true === $config['messenger']) {
             $messengerEventsSubscriber = new Definition(MessengerEventsSubscriber::class, [
-                new Reference('inspector')
+                new Reference(Inspector::class)
             ]);
 
             $messengerEventsSubscriber->setPublic(false)->addTag('kernel.event_subscriber');
@@ -86,7 +88,7 @@ class InspectorExtension extends Extension
          * Console events subscriber
          */
         $consoleEventsSubscriberDefinition = new Definition(ConsoleEventsSubscriber::class, [
-            new Reference('inspector'),
+            new Reference(Inspector::class),
             $config['ignore_commands'],
         ]);
 
@@ -98,7 +100,7 @@ class InspectorExtension extends Extension
          */
         if (true === $config['templates']) {
             $inspectableTwigExtensionDefinition = new Definition(InspectableTwigExtension::class, [
-                new Reference('inspector'),
+                new Reference(Inspector::class),
             ]);
 
             $inspectableTwigExtensionDefinition->addTag('twig.extension');
