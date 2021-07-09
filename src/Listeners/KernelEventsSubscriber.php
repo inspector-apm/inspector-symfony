@@ -162,6 +162,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
+
         try {
             $routeInfo = $this->router->match($request->getPathInfo());
             $this->routeName = $routeInfo['_route'];
@@ -169,7 +170,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             $this->routeName = $request->getPathInfo();
         }
 
-        if (!$this->isRequestEligibleForInspection($event)){
+        if (!$this->isRequestEligibleForInspection($event)) {
             return;
         }
 
@@ -266,6 +267,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         }
 
         $controllerLabel = $event->getRequest()->attributes->get('_controller');
+
         if ($controllerLabel) {
             $this->endSegment($controllerLabel);
         }

@@ -21,7 +21,7 @@ class InspectorExtension extends Extension
     /**
      * Current version of the bundle.
      */
-    const VERSION = '1.0.2';
+    const VERSION = '1.0.3';
 
     /**
      * Loads a specific configuration.
@@ -32,14 +32,15 @@ class InspectorExtension extends Extension
     {
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
-
         $container->setParameter('inspector.configuration', $config);
 
         if(true !== $config['enabled'] || empty($config['ingestion_key'])) {
             return;
         }
 
-        // Inspector configuration
+        /*
+         * Inspector configuration
+         */
         $inspectorConfigDefinition = new Definition(\Inspector\Configuration::class, [$config['ingestion_key']]);
         $inspectorConfigDefinition->setPublic(false);
         $inspectorConfigDefinition->addMethodCall('setEnabled', [$config['enabled']]);
@@ -50,13 +51,16 @@ class InspectorExtension extends Extension
 
         $container->setDefinition('inspector.configuration.internal', $inspectorConfigDefinition);
 
-        // Inspector service itself
+        /*
+         * Inspector service itself
+         */
         $inspectorDefinition = new Definition(Inspector::class, [$inspectorConfigDefinition]);
         $inspectorDefinition->setPublic(true);
-
         $container->setDefinition('inspector', $inspectorDefinition);
 
-        // Kernel events subscriber: request, response etc.
+        /*
+         * Kernel events subscriber: request, response etc.
+         */
         $kernelEventsSubscriberDefinition = new Definition(KernelEventsSubscriber::class, [
             new Reference('inspector'),
             new Reference('router'),
@@ -64,34 +68,40 @@ class InspectorExtension extends Extension
             $config['ignore_routes']
         ]);
         $kernelEventsSubscriberDefinition->setPublic(false)->addTag('kernel.event_subscriber');
-
         $container->setDefinition(KernelEventsSubscriber::class, $kernelEventsSubscriberDefinition);
 
+        /*
+         * Connect the messenger event subscriber
+         */
         if (interface_exists(MessageBusInterface::class) && true === $config['messenger']) {
-            // Messenger events subscriber
             $messengerEventsSubscriber = new Definition(MessengerEventsSubscriber::class, [
                 new Reference('inspector')
             ]);
-            $messengerEventsSubscriber->setPublic(false)->addTag('kernel.event_subscriber');
 
+            $messengerEventsSubscriber->setPublic(false)->addTag('kernel.event_subscriber');
             $container->setDefinition(MessengerEventsSubscriber::class, $messengerEventsSubscriber);
         }
 
-        // Console events subscriber
+        /*
+         * Console events subscriber
+         */
         $consoleEventsSubscriberDefinition = new Definition(ConsoleEventsSubscriber::class, [
             new Reference('inspector'),
             $config['ignore_commands'],
         ]);
-        $consoleEventsSubscriberDefinition->setPublic(false)->addTag('kernel.event_subscriber');
 
+        $consoleEventsSubscriberDefinition->setPublic(false)->addTag('kernel.event_subscriber');
         $container->setDefinition(ConsoleEventsSubscriber::class, $consoleEventsSubscriberDefinition);
 
+        /*
+         * Twig
+         */
         if (true === $config['templates']) {
             $inspectableTwigExtensionDefinition = new Definition(InspectableTwigExtension::class, [
                 new Reference('inspector'),
             ]);
-            $inspectableTwigExtensionDefinition->addTag('twig.extension');
 
+            $inspectableTwigExtensionDefinition->addTag('twig.extension');
             $container->setDefinition(InspectableTwigExtension::class, $inspectableTwigExtensionDefinition);
         }
 
