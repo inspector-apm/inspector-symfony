@@ -27,7 +27,6 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @uses onWorkerMessageReceived
      * @uses onWorkerMessageFailed
      * @uses onWorkerMessageHandled
      */
@@ -61,6 +60,10 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
      */
     public function onWorkerMessageHandled(WorkerMessageHandledEvent $event)
     {
+        if (!$this->inspector->hasTransaction()) {
+            return;
+        }
+
         $processedByStamps = $event->getEnvelope()->all(HandledStamp::class);
         $processedBy = [];
 
