@@ -86,7 +86,7 @@ class InspectorTestCommand extends Command
             return Command::FAILURE;
         }
 
-        $io->info("I'm testing your Inspector integration.");
+        $io->block("I'm testing your Inspector integration.", 'INFO', 'fg=green', ' ', true);
 
         // Test proc_open function availability
         try {
@@ -156,6 +156,6 @@ class InspectorTestCommand extends Command
 
         $io->success('Done!');
 
-        return Command::SUCCESS;
+        return 0;
     }
 }
