@@ -131,6 +131,8 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         $this->endSegment(KernelEvents::CONTROLLER_ARGUMENTS);
 
         $controllerLabel = $event->getRequest()->attributes->get('_controller');
+        // Can be the _controller field in request attributes an array?
+        $controllerLabel = is_string($controllerLabel) ? $controllerLabel : '_controller';
 
         $arguments = [];
         foreach ($event->getArguments() as $argument) {
