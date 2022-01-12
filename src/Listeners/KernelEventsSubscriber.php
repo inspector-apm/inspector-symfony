@@ -130,9 +130,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $this->endSegment(KernelEvents::CONTROLLER_ARGUMENTS);
 
-        $controllerLabel = $event->getRequest()->attributes->get('_controller');
-        // Can be the _controller field in request attributes an array?
-        $controllerLabel = is_string($controllerLabel) ? $controllerLabel : '_controller';
+        $controllerLabel = $this->controllerLabel($event);
 
         $arguments = [];
         foreach ($event->getArguments() as $argument) {
@@ -201,7 +199,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         }
 
         /** @var Segment $segment */
-        $controllerLabel = $event->getRequest()->attributes->get('_controller');
+        $controllerLabel = $this->controllerLabel($event);
         if ($controllerLabel) {
             $this->endSegment($controllerLabel);
         }
@@ -282,5 +280,24 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         $route = $event->getRequest()->attributes->get('_route') ?: $this->routeName;
 
         return $event->isMasterRequest() && !\in_array($route, $this->ignoredRoutes);
+    }
+
+    private function controllerLabel(KernelEvent $event): ?string
+    {
+        $controllerLabel = $event->getRequest()->attributes->get('_controller');
+
+        if (is_null($controllerLabel)) {
+            return null;
+        }
+
+        if (is_string($controllerLabel)) {
+            return $controllerLabel;
+        }
+
+        if (is_array($controllerLabel)) {
+            return implode('::', $controllerLabel);
+        }
+
+        return '_controller';
     }
 }
