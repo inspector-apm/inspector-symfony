@@ -178,6 +178,10 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function setAuthUserInfo(RequestEvent $event): void
     {
+        if (! $this->inspector->isRecording()) {
+            return;
+        }
+
         $user = $this->security->getUser();
 
         if ($user) {
@@ -234,19 +238,23 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      */
     public function onKernelException($event): void
     {
+        if (! $this->inspector->isRecording()) {
+            return;
+        }
         // Compatibility with Symfony < 5 and Symfony >=5
         // The additional `method_exists` check is to prevent errors in Symfony 4.3
         // where the ExceptionEvent exists and is used but doesn't implement
         // the `getThrowable` method, which was introduced in Symfony 4.4
         if ($event instanceof ExceptionEvent && \method_exists($event, 'getThrowable')) {
-            $this->startTransaction(get_class($event->getThrowable()))->setResult('error');
-            $this->notifyUnexpectedError($event->getThrowable());
+            $exception = $event->getThrowable();
         } elseif ($event instanceof GetResponseForExceptionEvent) {
-            $this->startTransaction(\get_class($event->getException()))->setResult('error');
-            $this->notifyUnexpectedError($event->getException());
+            $exception = $event->getException();
         } else {
             throw new \LogicException('Invalid exception event.');
         }
+
+        $this->startTransaction(get_class($exception))->setResult('error');
+        $this->notifyUnexpectedError($exception);
     }
 
     public function onKernelTerminate(TerminateEvent $event): void
@@ -279,7 +287,9 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     {
         $route = $event->getRequest()->attributes->get('_route') ?: $this->routeName;
 
-        return $this->isMasterMainRequest($event) && !\in_array($route, $this->ignoredRoutes);
+        return $this->isMasterMainRequest($event)
+            && !\in_array($route, $this->ignoredRoutes)
+            && $this->inspector->isRecording();
     }
 
     private function controllerLabel(KernelEvent $event): ?string

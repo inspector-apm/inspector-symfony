@@ -46,6 +46,10 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
      */
     public function onWorkerMessageFailed(WorkerMessageFailedEvent $event)
     {
+        if (! $this->inspector->isRecording()) {
+            return;
+        }
+
         // reportException will create a transaction if it doesn't exists.
         $this->inspector->reportException($event->getThrowable());
         $this->inspector->currentTransaction()->setResult('error');
