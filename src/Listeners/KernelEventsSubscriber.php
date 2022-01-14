@@ -253,7 +253,6 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             throw new \LogicException('Invalid exception event.');
         }
 
-        $this->startTransaction(get_class($exception))->setResult('error');
         $this->notifyUnexpectedError($exception);
     }
 
