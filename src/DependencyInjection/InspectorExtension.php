@@ -36,10 +36,6 @@ class InspectorExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
         $container->setParameter('inspector.configuration.definition', $config);
 
-        if(empty($config['ingestion_key'])) {
-            return;
-        }
-
         /*
          * Inspector configuration
          */
