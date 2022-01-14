@@ -312,7 +312,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     private function isMasterMainRequest(KernelEvent $event): bool
     {
-        return (method_exists($event, 'isMainRequest') && !$event->isMainRequest())
-        || (method_exists($event, 'isMasterRequest') && !$event->isMasterRequest());
+        return (method_exists($event, 'isMainRequest') && $event->isMainRequest())
+        || (method_exists($event, 'isMasterRequest') && $event->isMasterRequest());
     }
 }
