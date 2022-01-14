@@ -155,7 +155,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      */
     public function onKernelRequest(RequestEvent $event): void
     {
-        if (!$event->isMainRequest()) {
+        if ($this->isMasterMainRequest($event)) {
             return;
         }
 
@@ -279,7 +279,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     {
         $route = $event->getRequest()->attributes->get('_route') ?: $this->routeName;
 
-        return $event->isMainRequest() && !\in_array($route, $this->ignoredRoutes);
+        return $this->isMasterMainRequest($event) && !\in_array($route, $this->ignoredRoutes);
     }
 
     private function controllerLabel(KernelEvent $event): ?string
@@ -299,5 +299,11 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         }
 
         return '_controller';
+    }
+
+    private function isMasterMainRequest(KernelEvent $event): bool
+    {
+        return (method_exists($event, 'isMainRequest') && !$event->isMainRequest())
+        || (method_exists($event, 'isMasterRequest') && !$event->isMasterRequest());
     }
 }
