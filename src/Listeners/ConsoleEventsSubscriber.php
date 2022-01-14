@@ -86,7 +86,7 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
     public function onConsoleError(ConsoleErrorEvent $event): void
     {
         $command = $event->getCommand();
-        if (null === $command || $this->isIgnored($command)) {
+        if (null === $command || $this->isIgnored($command) || ! $this->inspector->isRecording()) {
             return;
         }
 

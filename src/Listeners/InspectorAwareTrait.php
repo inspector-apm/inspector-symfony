@@ -41,7 +41,7 @@ trait InspectorAwareTrait
      *
      * @throws \Exception
      */
-    protected function startTransaction(string $name): Transaction
+    protected function startTransaction(string $name): ?Transaction
     {
         if ($this->inspector->needTransaction()) {
             $this->inspector->startTransaction($name);
