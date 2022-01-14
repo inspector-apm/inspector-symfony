@@ -155,7 +155,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      */
     public function onKernelRequest(RequestEvent $event): void
     {
-        if ($this->isMasterMainRequest($event)) {
+        if (! $this->isMasterMainRequest($event)) {
             return;
         }
 
