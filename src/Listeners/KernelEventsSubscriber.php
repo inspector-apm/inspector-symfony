@@ -155,7 +155,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      */
     public function onKernelRequest(RequestEvent $event): void
     {
-        if (!$event->isMasterRequest()) {
+        if (! $this->isMasterMainRequest($event)) {
             return;
         }
 
@@ -185,7 +185,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         $user = $this->security->getUser();
 
         if ($user) {
-            $this->inspector->currentTransaction()->withUser($user->getUsername());
+            $this->inspector->currentTransaction()->withUser($user->getUserIdentifier());
         }
     }
 
@@ -286,7 +286,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     {
         $route = $event->getRequest()->attributes->get('_route') ?: $this->routeName;
 
-        return $event->isMasterRequest()
+        return $this->isMasterMainRequest($event)
             && !\in_array($route, $this->ignoredRoutes)
             && $this->inspector->isRecording();
     }
@@ -308,5 +308,11 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         }
 
         return '_controller';
+    }
+
+    private function isMasterMainRequest(KernelEvent $event): bool
+    {
+        return (method_exists($event, 'isMainRequest') && $event->isMainRequest())
+        || (method_exists($event, 'isMasterRequest') && $event->isMasterRequest());
     }
 }

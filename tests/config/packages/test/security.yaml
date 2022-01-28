@@ -10,10 +10,10 @@ security:
             # this firewall applies to all URLs
             pattern: ^/
 
-            # but the firewall does not require login on every page
-            # denying access is done in access_control or in your controllers
-            anonymous: true
-            lazy: true
-
     role_hierarchy:
         ROLE_ADMIN: ROLE_USER
+
+    access_control:
+        -
+            path: ^/,
+            roles: PUBLIC_ACCESS
