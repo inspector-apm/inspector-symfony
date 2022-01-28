@@ -2,7 +2,7 @@
 
 - [Requirements](#requirements)
 - [Install](#install)
-- [Configure the INGESTION key](#ingestion_key)
+- [Configure the INGESTION key](#key)
 - [See official Documentation](https://docs.inspector.dev)
 
 <a name="requirements"></a>
@@ -10,7 +10,7 @@
 ## Requirements
 
 - PHP >= 7.2
-- Symfony ^4.4|^5.2
+- Symfony ^4.4|^5.2|^6.0
 
 <a name="install"></a>
 
@@ -22,7 +22,7 @@ Install the latest version of the bundle:
 composer require inspector-apm/inspector-symfony
 ```
 
-<a name="ingestion_key"></a>
+<a name="key"></a>
 
 ### Configure the INGESTION Key
 
