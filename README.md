@@ -1,9 +1,17 @@
-# Simple Code Execution monitoring for Symfony applications
+# Inspector | Code Execution Monitoring tool
+
+[![Total Downloads](https://poser.pugx.org/inspector-apm/inspector-laravel/downloads)](//packagist.org/packages/inspector-apm/inspector-symfony)
+[![Latest Stable Version](https://poser.pugx.org/inspector-apm/inspector-laravel/v/stable)](https://packagist.org/packages/inspector-apm/inspector-symfony)
+[![License](https://poser.pugx.org/inspector-apm/inspector-laravel/license)](//packagist.org/packages/inspector-apm/inspector-symfony)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md)
+
+Simple code execution monitoring for Symfony applications.
 
 - [Requirements](#requirements)
 - [Install](#install)
 - [Configure the INGESTION key](#key)
-- [See official Documentation](https://docs.inspector.dev)
+- [Official Documentation](https://docs.inspector.dev)
+- [Contribution Guidelines](#contribution)
 
 <a name="requirements"></a>
 
@@ -35,10 +43,15 @@ inspector:
 
 You can obtain the `ingestion_key` creating a new project in your [Inspector](https://www.inspector.dev) dashboard.
 
-
 ## Official documentation
 
 **[See official documentation](https://docs.inspector.dev)**
+
+<a name="contribution"></a>
+
+## Contributing
+
+We encourage you to contribute to Inspector! Please check out the [Contribution Guidelines](CONTRIBUTING.md) about how to proceed. Join us!
 
 ## LICENSE
 
