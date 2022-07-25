@@ -1,8 +1,8 @@
 # Inspector | Code Execution Monitoring tool
 
-[![Total Downloads](https://poser.pugx.org/inspector-apm/inspector-laravel/downloads)](//packagist.org/packages/inspector-apm/inspector-symfony)
-[![Latest Stable Version](https://poser.pugx.org/inspector-apm/inspector-laravel/v/stable)](https://packagist.org/packages/inspector-apm/inspector-symfony)
-[![License](https://poser.pugx.org/inspector-apm/inspector-laravel/license)](//packagist.org/packages/inspector-apm/inspector-symfony)
+[![Total Downloads](https://poser.pugx.org/inspector-apm/inspector-symfony/downloads)](//packagist.org/packages/inspector-apm/inspector-symfony)
+[![Latest Stable Version](https://poser.pugx.org/inspector-apm/inspector-symfony/v/stable)](https://packagist.org/packages/inspector-apm/inspector-symfony)
+[![License](https://poser.pugx.org/inspector-apm/inspector-symfony/license)](//packagist.org/packages/inspector-apm/inspector-symfony)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md)
 
 Simple code execution monitoring for Symfony applications.
