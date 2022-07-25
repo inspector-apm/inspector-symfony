@@ -10,7 +10,7 @@ Simple code execution monitoring for Symfony applications.
 - [Requirements](#requirements)
 - [Install](#install)
 - [Configure the INGESTION key](#key)
-- [Official Documentation](https://docs.inspector.dev)
+- [Official Documentation](https://docs.inspector.dev/symfony)
 - [Contribution Guidelines](#contribution)
 
 <a name="requirements"></a>
@@ -45,7 +45,7 @@ You can obtain the `ingestion_key` creating a new project in your [Inspector](ht
 
 ## Official documentation
 
-**[See official documentation](https://docs.inspector.dev)**
+**[Go to the official documentation](https://docs.inspector.dev/symfony)**
 
 <a name="contribution"></a>
 
