@@ -23,7 +23,7 @@ class InspectorExtension extends Extension
     /**
      * Current version of the bundle.
      */
-    const VERSION = '1.0.7';
+    const VERSION = '1.1.1';
 
     /**
      * Loads a specific configuration.
@@ -44,7 +44,6 @@ class InspectorExtension extends Extension
         $inspectorConfigDefinition->addMethodCall('setEnabled', [$config['enabled']]);
         $inspectorConfigDefinition->addMethodCall('setUrl', [$config['url']]);
         $inspectorConfigDefinition->addMethodCall('setTransport', [$config['transport']]);
-        $inspectorConfigDefinition->addMethodCall('serverSamplingRatio', [$config['server_sampling_ratio']]);
         $inspectorConfigDefinition->addMethodCall('setVersion', [self::VERSION]);
 
         $container->setDefinition(\Inspector\Configuration::class, $inspectorConfigDefinition);

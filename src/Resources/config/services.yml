@@ -5,9 +5,3 @@ services:
         tags:
             - { name: 'console.command', command: 'inspector:test' }
 
-    Inspector\Symfony\Bundle\Command\InspectorPulseCommand:
-        arguments:
-          [ '@Inspector\Inspector' ]
-        tags:
-            - { name: 'console.command', command: 'inspector:pulse' }
-

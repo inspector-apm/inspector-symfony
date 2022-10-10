@@ -9,7 +9,6 @@ inspector:
     user: true
     templates: true
     transport: async
-    server_sampling_ratio: 0
     ignore_routes:
         - '_wdt'
         - '_profiler'

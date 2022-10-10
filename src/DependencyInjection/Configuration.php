@@ -26,7 +26,6 @@ class Configuration implements ConfigurationInterface
             ->booleanNode('templates')->defaultTrue()->end()
             ->booleanNode('user')->defaultTrue()->end()
             ->scalarNode('transport')->defaultValue('async')->end()
-            ->floatNode('server_sampling_ratio')->defaultValue(0)->end()
             ->arrayNode('ignore_routes')->scalarPrototype()->end()->end()
             ->arrayNode('ignore_commands')->scalarPrototype()->end()->end()
             ->end();
