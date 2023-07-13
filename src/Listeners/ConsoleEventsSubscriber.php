@@ -101,8 +101,8 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
         }
 
         $commandName = $command->getName();
-        if($this->inspector->hasTransaction() && $this->inspector->currentTransaction()->name === $commandName) {
-            $this->inspector->currentTransaction()->setResult($event->getExitCode() === 0 ? 'success' : 'error');
+        if($this->inspector->hasTransaction() && $this->inspector->transaction()->name === $commandName) {
+            $this->inspector->transaction()->setResult($event->getExitCode() === 0 ? 'success' : 'error');
         } elseif(\array_key_exists($commandName, $this->segments)) {
             $this->segments[$commandName]->end()->addContext('Command', [
                 'exit_code' => $event->getExitCode(),
@@ -120,7 +120,7 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
         }
 
         if ($this->inspector->canAddSegments()) {
-            $this->inspector->currentTransaction()->setResult('terminated');
+            $this->inspector->transaction()->setResult('terminated');
         }
     }
 

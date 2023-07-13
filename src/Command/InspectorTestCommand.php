@@ -133,7 +133,7 @@ class InspectorTestCommand extends Command
         // Report Exception
         $this->inspector->reportException(new \Exception('First Exception detected'));
         // End the transaction
-        $this->inspector->currentTransaction()
+        $this->inspector->transaction()
             ->setResult('success')
             ->end();
 

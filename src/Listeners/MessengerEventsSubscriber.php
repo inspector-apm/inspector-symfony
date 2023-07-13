@@ -52,7 +52,7 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
 
         // reportException will create a transaction if it doesn't exists.
         $this->inspector->reportException($event->getThrowable());
-        $this->inspector->currentTransaction()->setResult('error');
+        $this->inspector->transaction()->setResult('error');
         $this->inspector->flush();
     }
 
@@ -76,7 +76,7 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
             $processedBy[] = $handlerStamp->getHandlerName();
         }
 
-        $this->inspector->currentTransaction()
+        $this->inspector->transaction()
             ->addContext('Handlers', $processedBy)
             ->addContext('Envelope', \serialize($event->getEnvelope()));
 

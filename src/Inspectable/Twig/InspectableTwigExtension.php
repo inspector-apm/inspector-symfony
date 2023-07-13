@@ -63,14 +63,14 @@ final class InspectableTwigExtension extends AbstractExtension
     {
         $profile->leave();
 
-        if (!isset($this->segments[$profile->getTemplate()])) {
+        $key = $profile->getTemplate();
+
+        if (!isset($this->segments[$key])) {
             return;
         }
 
-        $label = $this->getLabelTitle($profile);
-
-        $this->segments[$profile->getTemplate()]->addContext($label, [
-            'template' => $profile->getTemplate(),
+        $this->segments[$profile->getTemplate()]->addContext('Data', [
+            'template' => $key,
             'type' => $profile->getType(),
             'name' => $profile->getName(),
             'duration' => $profile->getDuration(),
@@ -78,9 +78,9 @@ final class InspectableTwigExtension extends AbstractExtension
             'peak_memory_usage' => $profile->getPeakMemoryUsage(),
         ]);
 
-        $this->segments[$profile->getTemplate()]->end();
+        $this->segments[$key]->end();
 
-        unset($this->segments[$label]);
+        unset($this->segments[$key]);
     }
 
     /**

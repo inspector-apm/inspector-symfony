@@ -30,18 +30,22 @@ Install the latest version of the bundle:
 composer require inspector-apm/inspector-symfony
 ```
 
+## Recipe (recommended)
+
+You will be prompted to run the recipe. It will autoconfigure the package for you
+creating the necessary environment variable and `inspector.yaml` configuration file.
+
 <a name="key"></a>
 
-### Configure the INGESTION Key
+## Configure the INGESTION Key
 
-Create the `inspector.yaml` configuration file in your `config/packages` directory, and put the `ingestion_key` field inside:
+You can obtain the `ingestion key` creating a new project in your [Inspector](https://app.inspector.dev) dashboard.
 
-```yaml
-inspector:
-    ingestion_key: [your-ingestion-key]
+```dotenv
+###> inspector-apm/inspector-symfony ###
+INSPECTOR_INGESTION_KEY=895d9e6dxxxxxxxxxxxxxxxxx
+###< inspector-apm/inspector-symfony ###
 ```
-
-You can obtain the `ingestion_key` creating a new project in your [Inspector](https://www.inspector.dev) dashboard.
 
 ## Official documentation
 
@@ -51,7 +55,8 @@ You can obtain the `ingestion_key` creating a new project in your [Inspector](ht
 
 ## Contributing
 
-We encourage you to contribute to Inspector! Please check out the [Contribution Guidelines](CONTRIBUTING.md) about how to proceed. Join us!
+We encourage you to contribute to the development of the Inspector bundle!
+Please check out the [Contribution Guidelines](CONTRIBUTING.md) about how to proceed. Join us!
 
 ## LICENSE
 

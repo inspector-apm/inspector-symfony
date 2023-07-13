@@ -47,7 +47,7 @@ trait InspectorAwareTrait
             $this->inspector->startTransaction($name);
         }
 
-        return $this->inspector->currentTransaction();
+        return $this->inspector->transaction();
     }
 
     /**

@@ -185,7 +185,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         $user = $this->security->getUser();
 
         if ($user) {
-            $this->inspector->currentTransaction()->withUser($user->getUserIdentifier());
+            $this->inspector->transaction()->withUser($user->getUserIdentifier());
         }
     }
 
@@ -262,7 +262,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->inspector->currentTransaction()->setResult($event->getResponse()->getStatusCode());
+        $this->inspector->transaction()->setResult($event->getResponse()->getStatusCode());
     }
 
     public function onKernelView(ViewEvent $event): void
