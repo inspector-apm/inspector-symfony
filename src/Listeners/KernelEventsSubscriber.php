@@ -108,7 +108,8 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $this->endSegment(KernelEvents::REQUEST);
 
-        $this->startSegment(self::SEGMENT_TYPE_CONTROLLER, KernelEvents::CONTROLLER);
+        $this->startSegment(self::SEGMENT_TYPE_CONTROLLER, KernelEvents::CONTROLLER)
+            ->addContext('Description', KernelEvents::CONTROLLER." event occurs once a controller was found for handling a request.");
     }
 
     public function onKernelPreControllerArguments(ControllerArgumentsEvent $event): void
@@ -119,7 +120,8 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $this->endSegment(KernelEvents::CONTROLLER);
 
-        $this->startSegment(self::SEGMENT_TYPE_CONTROLLER, KernelEvents::CONTROLLER_ARGUMENTS);
+        $this->startSegment(self::SEGMENT_TYPE_CONTROLLER, KernelEvents::CONTROLLER_ARGUMENTS)
+            ->addContext('Description', KernelEvents::CONTROLLER_ARGUMENTS." event occurs once controller arguments have been resolved.");
     }
 
     public function onKernelPostControllerArguments(ControllerArgumentsEvent $event): void
@@ -159,6 +161,10 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
+        if (!$this->isRequestEligibleForInspection($event)) {
+            return;
+        }
+
         $request = $event->getRequest();
 
         try {
@@ -166,10 +172,6 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             $this->routeName = $routeInfo['_route'];
         } catch (\Throwable $exception) {
             $this->routeName = $request->getPathInfo();
-        }
-
-        if (!$this->isRequestEligibleForInspection($event)) {
-            return;
         }
 
         $this->startTransaction($event->getRequest()->getMethod() . ' /' . \trim($this->routeName, '/'));
@@ -202,15 +204,16 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        /** @var Segment $segment */
+        // End segment based on kernel event type
         $controllerLabel = $this->controllerLabel($event);
         if ($controllerLabel) {
             $this->endSegment($controllerLabel);
         }
-
         $this->endSegment(KernelEvents::REQUEST);
         $this->endSegment(KernelEvents::VIEW);
+
         $response = $event->getResponse();
+
         $segment = $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::RESPONSE);
         $segment->addContext(KernelEvents::RESPONSE, ['response' => [
             'headers' => $response->headers->all(),

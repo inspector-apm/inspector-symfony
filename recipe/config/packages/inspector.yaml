@@ -24,6 +24,7 @@ inspector:
     ignore_commands:
         - 'messenger:consume'
         # Development commands section
+        - 'cache:clear'
         - 'debug:autowiring'
         - 'debug:config'
         - 'debug:container'

@@ -23,7 +23,7 @@ class InspectorExtension extends Extension
     /**
      * Current version of the bundle.
      */
-    const VERSION = '1.1.2';
+    const VERSION = '1.1.3';
 
     /**
      * Loads a specific configuration.
@@ -68,16 +68,16 @@ class InspectorExtension extends Extension
         $container->setDefinition(KernelEventsSubscriber::class, $kernelEventsSubscriberDefinition);
 
         /*
-         * Connect the messenger event subscriber
+         * todo: Connect the messenger event subscriber
          */
-        if (interface_exists(MessageBusInterface::class) && true === $config['messenger']) {
+        /*if (interface_exists(MessageBusInterface::class) && true === $config['messenger']) {
             $messengerEventsSubscriber = new Definition(MessengerEventsSubscriber::class, [
                 new Reference(Inspector::class)
             ]);
 
             $messengerEventsSubscriber->setPublic(false)->addTag('kernel.event_subscriber');
             $container->setDefinition(MessengerEventsSubscriber::class, $messengerEventsSubscriber);
-        }
+        }*/
 
         /*
          * Console events subscriber
