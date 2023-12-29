@@ -24,7 +24,7 @@ class InspectorTestCommand extends Command
      *
      * @var string|null
      */
-    protected static $defaultDescription = 'Send data to your Inspector dashboard.';
+    protected static $defaultDescription = 'Test the application configuration.';
 
     /**
      * @var Inspector
@@ -62,8 +62,7 @@ class InspectorTestCommand extends Command
      */
     protected function configure(): void
     {
-        $this
-            ->setName(self::$defaultName)
+        $this->setName(self::$defaultName)
             ->setDescription(self::$defaultDescription)
         ;
     }
@@ -116,7 +115,7 @@ class InspectorTestCommand extends Command
                 ? $io->text('✅ Inspector is enabled.')
                 : $io->warning('❌ Inspector is actually disabled, turn to true the `enable` field of the `inspector` config file.');
 
-            $segment->addContext('another payload', ['enable' => $this->configuration->isEnabled()]);
+            $segment->addContext('example payload', ['enable' => $this->configuration->isEnabled()]);
         }, 'test', 'Check if Inspector is enabled');
 
         // Check CURL
@@ -126,8 +125,6 @@ class InspectorTestCommand extends Command
             function_exists('curl_version')
                 ? $io->text('✅ CURL extension is enabled.')
                 : $io->warning('❌ CURL is actually disabled so your app could not be able to send data to Inspector.');
-
-            $segment->addContext('another payload', ['foo' => 'bar']);
         }, 'test', 'Check CURL extension');
 
         // Report Exception
@@ -139,20 +136,6 @@ class InspectorTestCommand extends Command
 
         // Logs will be reported in the transaction context.
         $this->logger->debug("Here you'll find log entries generated during the transaction.");
-
-        /*
-         * Loading demo data
-         */
-        $io->text('Loading demo data...');
-
-        foreach ([1, 2, 3, 4, 5, 6] as $minutes) {
-            $this->inspector->startTransaction("Other transactions")
-                ->start(microtime(true) - 60*$minutes)
-                ->setResult('success')
-                ->end(rand(100, 200));
-
-            $this->logger->debug("Here you'll find log entries generated during the transaction.");
-        }
 
         $io->success('Done!');
 
