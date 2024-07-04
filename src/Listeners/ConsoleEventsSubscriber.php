@@ -69,6 +69,7 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
         $commandName = $command->getName();
         if ($this->inspector->needTransaction()) {
             $this->inspector->startTransaction($commandName)
+                ->setType('command')
                 ->addContext('Command', [
                     'arguments' => $event->getInput()->getArguments(),
                     'options' => $event->getInput()->getOptions(),

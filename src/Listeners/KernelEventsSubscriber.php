@@ -174,7 +174,9 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             $this->routeName = $request->getPathInfo();
         }
 
-        $this->startTransaction($event->getRequest()->getMethod() . ' /' . \trim($this->routeName, '/'));
+        $this->startTransaction($event->getRequest()->getMethod() . ' /' . \trim($this->routeName, '/'))
+            ->markAsRequest();
+
         $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::REQUEST);
     }
 
