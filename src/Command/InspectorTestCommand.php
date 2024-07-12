@@ -4,6 +4,7 @@ namespace Inspector\Symfony\Bundle\Command;
 
 use Inspector\Inspector;
 use Inspector\Configuration;
+use Inspector\Models\Segment;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -97,7 +98,7 @@ class InspectorTestCommand extends Command
         }
 
         // Check Inspector API key
-        $this->inspector->addSegment(function ($segment) use ($io) {
+        $this->inspector->addSegment(function (Segment $segment) use ($io) {
             usleep(10 * 1000);
 
             !empty($this->configuration->getIngestionKey())
@@ -108,7 +109,7 @@ class InspectorTestCommand extends Command
         }, 'test', 'Check Ingestion key');
 
         // Check Inspector is enabled
-        $this->inspector->addSegment(function ($segment) use ($io) {
+        $this->inspector->addSegment(function (Segment $segment) use ($io) {
             usleep(10 * 1000);
 
             $this->configuration->isEnabled()
@@ -119,7 +120,7 @@ class InspectorTestCommand extends Command
         }, 'test', 'Check if Inspector is enabled');
 
         // Check CURL
-        $this->inspector->addSegment(function ($segment) use ($io) {
+        $this->inspector->addSegment(function () use ($io) {
             usleep(10 * 1000);
 
             function_exists('curl_version')
@@ -127,15 +128,18 @@ class InspectorTestCommand extends Command
                 : $io->warning('❌ CURL is actually disabled so your app could not be able to send data to Inspector.');
         }, 'test', 'Check CURL extension');
 
+        // Report a bad query
+        $this->inspector->addSegment(function () {
+            sleep(1);
+        }, 'mysql', "SELECT name, (SELECT COUNT(*) FROM orders WHERE user_id = users.id) AS order_count FROM users");
+
         // Report Exception
         $this->inspector->reportException(new \Exception('First Exception detected'));
+
         // End the transaction
         $this->inspector->transaction()
             ->setResult('success')
             ->end();
-
-        // Logs will be reported in the transaction context.
-        $this->logger->debug("Here you'll find log entries generated during the transaction.");
 
         $io->success('Done!');
 
