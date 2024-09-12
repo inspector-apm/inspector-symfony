@@ -5,7 +5,9 @@
 [![License](https://poser.pugx.org/inspector-apm/inspector-symfony/license)](//packagist.org/packages/inspector-apm/inspector-symfony)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md)
 
-Simple code execution monitoring for Symfony applications.
+> Before moving on, please consider giving us a GitHub star ⭐️. Thank you!
+
+Code Execution Monitoring for Symfony applications.
 
 - [Requirements](#requirements)
 - [Install](#install)
