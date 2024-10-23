@@ -7,15 +7,14 @@ use Inspector\Inspector;
 use Inspector\Symfony\Bundle\Inspectable\Twig\InspectableTwigExtension;
 use Inspector\Symfony\Bundle\Listeners\ConsoleEventsSubscriber;
 use Inspector\Symfony\Bundle\Listeners\KernelEventsSubscriber;
-use Inspector\Symfony\Bundle\Listeners\MessengerEventsSubscriber;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Security;
 
 class InspectorExtension extends Extension
@@ -23,7 +22,7 @@ class InspectorExtension extends Extension
     /**
      * Current version of the bundle.
      */
-    const VERSION = '1.2.1';
+    const VERSION = '1.2.2';
 
     /**
      * Loads a specific configuration.
@@ -58,12 +57,23 @@ class InspectorExtension extends Extension
         /*
          * Kernel events subscriber: request, response etc.
          */
-        $kernelEventsSubscriberDefinition = new Definition(KernelEventsSubscriber::class, [
-            new Reference(Inspector::class),
-            new Reference(RouterInterface::class),
-            new Reference(Security::class),
-            $config['ignore_routes']
-        ]);
+        if (class_exists(Security::class)) {
+            $kernelEventsSubscriberDefinition = new Definition(KernelEventsSubscriber::class, [
+                new Reference(Inspector::class),
+                new Reference(RouterInterface::class),
+                new Reference(Security::class),
+                null,
+                $config['ignore_routes']
+            ]);
+        } else {
+            $kernelEventsSubscriberDefinition = new Definition(KernelEventsSubscriber::class, [
+                new Reference(Inspector::class),
+                new Reference(RouterInterface::class),
+                null,
+                new Reference(TokenStorageInterface::class),
+                $config['ignore_routes']
+            ]);
+        }
         $kernelEventsSubscriberDefinition->setPublic(false)->addTag('kernel.event_subscriber');
         $container->setDefinition(KernelEventsSubscriber::class, $kernelEventsSubscriberDefinition);
 

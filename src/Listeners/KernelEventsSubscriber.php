@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Security;
 
 /**
@@ -46,9 +47,14 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     protected $router;
 
     /**
-     * @var Security
+     * @var Security|null
      */
     protected $security;
+
+    /**
+     * @var TokenStorageInterface|null
+     */
+    protected $tokenStorage;
 
     /**
      * KernelEventsSubscriber constructor.
@@ -61,12 +67,14 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     public function __construct(
         Inspector $inspector,
         RouterInterface $router,
-        Security $security,
+        ?Security $security,
+        ?TokenStorageInterface $tokenStorage,
         array $ignoredRoutes
     ) {
         $this->inspector = $inspector;
         $this->router = $router;
         $this->security = $security;
+        $this->tokenStorage = $tokenStorage;
         $this->ignoredRoutes = $ignoredRoutes;
     }
 
@@ -186,7 +194,17 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $user = $this->security->getUser();
+        if (null !== $this->tokenStorage) {
+            if (null === $token = $this->tokenStorage->getToken()) {
+                return;
+            }
+
+            if (null === $user = $token->getUser()) {
+                return;
+            }
+        } else if (null !== $this->security) {
+            $user = $this->security->getUser();
+        }
 
         if ($user) {
             $this->inspector->transaction()->withUser($user->getUserIdentifier());
