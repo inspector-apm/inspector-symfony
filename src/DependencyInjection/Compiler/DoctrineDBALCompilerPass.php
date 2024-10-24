@@ -5,9 +5,11 @@ namespace Inspector\Symfony\Bundle\DependencyInjection\Compiler;
 /** Compatibility with doctrine/dbal < 2.10.0 */
 
 use Doctrine\DBAL\Logging\LoggerChain;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\SQLParserUtils;
 use Inspector\Inspector;
-use Inspector\Symfony\Bundle\Inspectable\Doctrine\DBAL\Logging\InspectableSQLLogger;
+use Inspector\Symfony\Bundle\Inspectable\Doctrine\DBAL\Logging\InspectorSQLLogger;
+use Inspector\Symfony\Bundle\Inspectable\Doctrine\Middleware\InspectorMiddleware;
 use OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,37 +27,65 @@ class DoctrineDBALCompilerPass implements CompilerPassInterface
         $config = $container->getParameter('inspector.configuration.definition');
 
         if (true !== $config['enabled'] || true !== $config['query'] || empty($config['ingestion_key'])) {
+            // Inspector is not enabled, no service required.
             return;
         }
 
-        if (!$container->hasDefinition('doctrine') || !$container->hasDefinition('doctrine.dbal.logger.chain')) {
+        if (!$container->hasDefinition('doctrine')) {
+            // No Doctrine service, no service required.
+            return;
+        }
+
+        /** @var array<string, string> $connections */
+        $connections = $container->getParameter('doctrine.connections');
+        if (count($connections) === 0) {
+            // No Doctrine connections configured, no service required.
+            return;
+        }
+
+        if (class_exists(Result::class)) {
+            // Doctrine DBAL 3+
+            foreach ($connections as $name => $service) {
+                $inspectorMiddlewareDefinition = new Definition(InspectorMiddleware::class, [
+                    new Reference(Inspector::class),
+                    $config,
+                    $name
+                ]);
+                $middlewareDefinitionName = sprintf('doctrine.dbal.inspector_middleware.%s', $name);
+                $inspectorMiddlewareDefinition->addTag('doctrine.middleware', ['connections' => [$name]]);
+                $container->setDefinition($middlewareDefinitionName, $inspectorMiddlewareDefinition);
+            }
+
+            return;
+        }
+
+        // Doctrine DBAL 2
+        if (!$container->hasDefinition('doctrine.dbal.logger.chain')) {
+            // Without DBAL Logger Chain it's not possible to add Inspector SQL Logger
             return;
         }
 
         $chainLogger = $container->getDefinition('doctrine.dbal.logger.chain');
-
-        /** @var array<string, string> $connections */
-        $connections = $container->getParameter('doctrine.connections');
         foreach ($connections as $name => $service) {
             // SQL Logger for Doctrine DBAL to use in Inspector.dev
-            $inspectableSqlLoggerDefinition = new Definition(InspectableSQLLogger::class, [
+            $inspectorSqlLoggerDefinition = new Definition(InspectorSQLLogger::class, [
                 new Reference(Inspector::class),
                 $config,
-                $name
+                $name,
             ]);
 
             $loggerDefinitionName = sprintf('doctrine.dbal.%s_connection.logger.inspectable', $name);
-            $container->setDefinition($loggerDefinitionName, $inspectableSqlLoggerDefinition);
+            $container->setDefinition($loggerDefinitionName, $inspectorSqlLoggerDefinition);
 
             // Adding inspectable logger to the Doctrine logger
             $logger = new Reference($loggerDefinitionName);
-            if (! method_exists(SQLParserUtils::class, 'getPositionalPlaceholderPositions') && method_exists(LoggerChain::class, 'addLogger')) {
+            if (!method_exists(SQLParserUtils::class, 'getPositionalPlaceholderPositions') && method_exists(LoggerChain::class, 'addLogger')) {
                 // doctrine/dbal < 2.10.0
                 $chainLogger->addMethodCall('addLogger', [$logger]);
             } else {
                 try {
                     $loggers = $chainLogger->getArgument(0);
-                    array_push($loggers, $logger);
+                    $loggers[] = $logger;
                     $chainLogger->replaceArgument(0, $loggers);
                 } catch (OutOfBoundsException $exception) {
                     $chainLogger->addArgument([$logger]);

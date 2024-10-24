@@ -1,18 +1,14 @@
 <?php
 
-namespace Inspector\Symfony\Bundle\Inspectable\Doctrine\DBAL\Logging;
+namespace Inspector\Symfony\Bundle\Inspectable\Doctrine;
 
-use Doctrine\DBAL\Logging\SQLLogger;
 use Doctrine\DBAL\Types\Type;
 use Inspector\Inspector;
 
-class InspectableSQLLogger implements SQLLogger
+class InspectorSQLSegmentTracer
 {
     /** @var Inspector */
     protected $inspector;
-
-    /** @var \Inspector\Models\PerformanceModel|\Inspector\Models\Segment */
-    protected $segment;
 
     /** @var array */
     protected $configuration;
@@ -20,22 +16,21 @@ class InspectableSQLLogger implements SQLLogger
     /** @var string */
     protected $connectionName;
 
-    /**
-     * InspectableSQLLogger constructor.
-     *
-     * @param Inspector $inspector
-     * @param array $configuration
-     * @param string $connectionName
-     */
-    public function __construct(Inspector $inspector, array $configuration, string $connectionName)
-    {
+    /** @var \Inspector\Models\PerformanceModel|\Inspector\Models\Segment */
+    protected $segment;
+
+    public function __construct(
+        Inspector $inspector,
+        array $configuration,
+        string $connectionName
+    ) {
         $this->inspector = $inspector;
         $this->configuration = $configuration;
         $this->connectionName = $connectionName;
     }
 
     /**
-     * Logs a SQL statement.
+     * Trace a SQL statement.
      *
      * @param string $sql SQL statement
      * @param array<int, mixed>|array<string, mixed>|null $params Statement parameters
@@ -44,11 +39,11 @@ class InspectableSQLLogger implements SQLLogger
     public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
         // This check is needed as transaction is flushed in MessengerEventSubscriber
-        if (!$this->inspector->hasTransaction()) {
+        if (!$this->inspector->isRecording()) {
             return;
         }
 
-        $this->segment = $this->inspector->startSegment("doctrine:".$this->connectionName, substr($sql, 0, 50));
+        $this->segment = $this->inspector->startSegment($this->connectionName, $sql);
 
         $context = ['sql' => $sql];
 

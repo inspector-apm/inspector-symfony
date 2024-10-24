@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Security;
 
 /**
@@ -46,9 +47,14 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     protected $router;
 
     /**
-     * @var Security
+     * @var Security|null
      */
     protected $security;
+
+    /**
+     * @var TokenStorageInterface|null
+     */
+    protected $tokenStorage;
 
     /**
      * KernelEventsSubscriber constructor.
@@ -61,12 +67,14 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     public function __construct(
         Inspector $inspector,
         RouterInterface $router,
-        Security $security,
+        ?Security $security,
+        ?TokenStorageInterface $tokenStorage,
         array $ignoredRoutes
     ) {
         $this->inspector = $inspector;
         $this->router = $router;
         $this->security = $security;
+        $this->tokenStorage = $tokenStorage;
         $this->ignoredRoutes = $ignoredRoutes;
     }
 
@@ -186,10 +194,30 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $user = $this->security->getUser();
+        if (null !== $this->tokenStorage) {
+            // Symfony Security Bundle 7+
+            if (null === $token = $this->tokenStorage->getToken()) {
+                return;
+            }
+
+            if (null === $user = $token->getUser()) {
+                return;
+            }
+        } elseif (null !== $this->security) {
+            // Symfony Security Bundle <7
+            // Symfony\Component\Security\Core\Security exists since 7.
+            $user = $this->security->getUser();
+        } else {
+            $user = null;
+        }
 
         if ($user) {
-            $this->inspector->transaction()->withUser($user->getUserIdentifier());
+            $transaction = $this->inspector->transaction();
+            if (null === $transaction) {
+                return;
+            }
+
+            $transaction->withUser($user->getUserIdentifier());
         }
     }
 
@@ -243,7 +271,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      */
     public function onKernelException($event): void
     {
-        if (! $this->inspector->isRecording()) {
+        if (!$this->inspector->isRecording()) {
             return;
         }
         // Compatibility with Symfony < 5 and Symfony >=5
@@ -263,7 +291,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelTerminate(TerminateEvent $event): void
     {
-        if (!$this->isRequestEligibleForInspection($event)){
+        if (!$this->inspector->isRecording()){
             return;
         }
 
