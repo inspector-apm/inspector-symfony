@@ -1,12 +1,12 @@
 <?php
 
-namespace Inspector\Symfony\Bundle\Inspectable\Doctrine\Middleware;
+namespace Inspector\Symfony\Bundle\Doctrine\Middleware\V4;
 
 use Doctrine\DBAL\Driver\Middleware\AbstractStatementMiddleware;
 use Doctrine\DBAL\Driver\Result as ResultInterface;
 use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\ParameterType;
-use Inspector\Symfony\Bundle\Inspectable\Doctrine\InspectorSQLSegmentTracer;
+use Inspector\Symfony\Bundle\Doctrine\Middleware\InspectorSQLSegmentTracer;
 
 /**
  * Statement class for Doctrine DBAL4+

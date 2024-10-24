@@ -1,11 +1,11 @@
 <?php
 
-namespace Inspector\Symfony\Bundle\Inspectable\Doctrine\DBAL\Logging;
+namespace Inspector\Symfony\Bundle\Doctrine\V2;
 
 use Doctrine\DBAL\Logging\SQLLogger;
 use Doctrine\DBAL\Types\Type;
 use Inspector\Inspector;
-use Inspector\Symfony\Bundle\Inspectable\Doctrine\InspectorSQLSegmentTracer;
+use Inspector\Symfony\Bundle\Doctrine\Middleware\InspectorSQLSegmentTracer;
 
 class InspectorSQLLogger implements SQLLogger
 {

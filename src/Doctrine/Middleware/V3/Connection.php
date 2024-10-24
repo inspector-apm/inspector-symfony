@@ -1,14 +1,14 @@
 <?php
 
-namespace Inspector\Symfony\Bundle\Inspectable\Doctrine\Middleware;
+namespace Inspector\Symfony\Bundle\Doctrine\Middleware\V3;
 
 use Doctrine\DBAL\Driver\Connection as ConnectionInterface;
 use Doctrine\DBAL\Driver\Middleware\AbstractConnectionMiddleware;
 use Doctrine\DBAL\Driver\Result;
-use Inspector\Symfony\Bundle\Inspectable\Doctrine\InspectorSQLSegmentTracer;
+use Inspector\Symfony\Bundle\Doctrine\Middleware\InspectorSQLSegmentTracer;
 
 /**
- * Connection class for Doctrine DBAL4+
+ * Connection class for Doctrine DBAL3
  *
  * @internal
  */
@@ -16,6 +16,8 @@ class Connection extends AbstractConnectionMiddleware
 {
     /** @var InspectorSQLSegmentTracer */
     protected $inspectorSQLSegmentTracer;
+
+    private int $nestingLevel = 0;
 
     public function __construct(
         ConnectionInterface $connection,
@@ -51,42 +53,46 @@ class Connection extends AbstractConnectionMiddleware
         $this->inspectorSQLSegmentTracer->startQuery($sql);
 
         try {
-            $affectedRows = parent::exec($sql);
-        } finally {
-            $this->inspectorSQLSegmentTracer->stopQuery();
-        }
-
-        return $affectedRows;
-    }
-
-    public function beginTransaction(): void
-    {
-        $this->inspectorSQLSegmentTracer->startQuery('START TRANSACTION');
-
-        try {
-            parent::beginTransaction();
+            return parent::exec($sql);
         } finally {
             $this->inspectorSQLSegmentTracer->stopQuery();
         }
     }
 
-    public function commit(): void
+    public function beginTransaction(): bool
     {
-        $this->inspectorSQLSegmentTracer->startQuery('COMMIT');
+        if (1 === ++$this->nestingLevel) {
+            $this->inspectorSQLSegmentTracer->startQuery('START TRANSACTION');
+        }
 
         try {
-            parent::commit();
+            return parent::beginTransaction();
         } finally {
             $this->inspectorSQLSegmentTracer->stopQuery();
         }
     }
 
-    public function rollBack(): void
+    public function commit(): bool
     {
-        $this->inspectorSQLSegmentTracer->startQuery('ROLLBACK');
+        if (1 === $this->nestingLevel--) {
+            $this->inspectorSQLSegmentTracer->startQuery('COMMIT');
+        }
 
         try {
-            parent::rollBack();
+            return parent::commit();
+        } finally {
+            $this->inspectorSQLSegmentTracer->stopQuery();
+        }
+    }
+
+    public function rollBack(): bool
+    {
+        if (1 === $this->nestingLevel--) {
+            $this->inspectorSQLSegmentTracer->startQuery('ROLLBACK');
+        }
+
+        try {
+            return parent::rollBack();
         } finally {
             $this->inspectorSQLSegmentTracer->stopQuery();
         }

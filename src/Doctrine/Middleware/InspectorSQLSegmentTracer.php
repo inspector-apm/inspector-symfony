@@ -1,6 +1,6 @@
 <?php
 
-namespace Inspector\Symfony\Bundle\Inspectable\Doctrine;
+namespace Inspector\Symfony\Bundle\Doctrine\Middleware;
 
 use Doctrine\DBAL\Types\Type;
 use Inspector\Inspector;

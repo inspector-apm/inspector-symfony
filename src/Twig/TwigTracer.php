@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Inspector\Symfony\Bundle\Inspectable\Twig;
+namespace Inspector\Symfony\Bundle\Twig;
 
 use Inspector\Inspector;
 use Inspector\Models\Segment;
@@ -10,7 +10,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\Profiler\NodeVisitor\ProfilerNodeVisitor;
 use Twig\Profiler\Profile;
 
-final class InspectableTwigExtension extends AbstractExtension
+final class TwigTracer extends AbstractExtension
 {
     /**
      * @var Inspector

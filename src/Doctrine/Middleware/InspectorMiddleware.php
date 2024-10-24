@@ -1,11 +1,12 @@
 <?php
 
-namespace Inspector\Symfony\Bundle\Inspectable\Doctrine\Middleware;
+namespace Inspector\Symfony\Bundle\Doctrine\Middleware;
 
 use Doctrine\DBAL\Driver as DriverInterface;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
 use Inspector\Inspector;
-use Inspector\Symfony\Bundle\Inspectable\Doctrine\InspectorSQLSegmentTracer;
+use Inspector\Symfony\Bundle\Doctrine\Middleware\InspectorSQLSegmentTracer;
+use Inspector\Symfony\Bundle\Doctrine\Middleware\InspectorDriver;
 
 class InspectorMiddleware implements MiddlewareInterface
 {

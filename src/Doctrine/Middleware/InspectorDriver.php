@@ -1,11 +1,13 @@
 <?php
 
-namespace Inspector\Symfony\Bundle\Inspectable\Doctrine\Middleware;
+namespace Inspector\Symfony\Bundle\Doctrine\Middleware;
 
 use Doctrine\DBAL\Driver as DriverInterface;
 use Doctrine\DBAL\Driver\Connection as ConnectionInterface;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
-use Inspector\Symfony\Bundle\Inspectable\Doctrine\InspectorSQLSegmentTracer;
+use Inspector\Symfony\Bundle\Doctrine\Middleware\InspectorSQLSegmentTracer;
+use Inspector\Symfony\Bundle\Doctrine\Middleware\V4\Connection;
+use Inspector\Symfony\Bundle\Inspectable\Doctrine\Middleware\DBAL3;
 
 /**
  * @internal
@@ -32,7 +34,7 @@ class InspectorDriver extends AbstractDriverMiddleware
         // https://github.com/symfony/symfony/issues/47962
         if ('void' !== (string) (new \ReflectionMethod(DriverInterface\Connection::class, 'commit'))->getReturnType()) {
             // Doctrine DBAL 3
-            return new DBAL3\Connection(
+            return new V3\Connection(
                 $connection,
                 $this->inspectorSQLSegmentTracer
             );

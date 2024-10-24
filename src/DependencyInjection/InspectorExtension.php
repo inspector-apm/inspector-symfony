@@ -4,7 +4,7 @@
 namespace Inspector\Symfony\Bundle\DependencyInjection;
 
 use Inspector\Inspector;
-use Inspector\Symfony\Bundle\Inspectable\Twig\InspectableTwigExtension;
+use Inspector\Symfony\Bundle\Twig\TwigTracer;
 use Inspector\Symfony\Bundle\Listeners\ConsoleEventsSubscriber;
 use Inspector\Symfony\Bundle\Listeners\KernelEventsSubscriber;
 use Symfony\Component\Config\FileLocator;
@@ -117,12 +117,12 @@ class InspectorExtension extends Extension
          * Twig
          */
         if (true === $config['templates']) {
-            $inspectableTwigExtensionDefinition = new Definition(InspectableTwigExtension::class, [
+            $inspectableTwigExtensionDefinition = new Definition(TwigTracer::class, [
                 new Reference(Inspector::class),
             ]);
 
             $inspectableTwigExtensionDefinition->addTag('twig.extension');
-            $container->setDefinition(InspectableTwigExtension::class, $inspectableTwigExtensionDefinition);
+            $container->setDefinition(TwigTracer::class, $inspectableTwigExtensionDefinition);
         }
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
