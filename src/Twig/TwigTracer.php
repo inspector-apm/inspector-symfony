@@ -23,7 +23,7 @@ final class TwigTracer extends AbstractExtension
     protected $segments = [];
 
     /**
-     * InspectableTwigExtension constructor.
+     * TwigTracer constructor.
      *
      * @param Inspector $inspector
      */
