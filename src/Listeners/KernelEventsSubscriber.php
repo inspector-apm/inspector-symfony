@@ -195,6 +195,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         }
 
         if (null !== $this->tokenStorage) {
+            // Symfony Security Bundle 7+
             if (null === $token = $this->tokenStorage->getToken()) {
                 return;
             }
@@ -202,12 +203,21 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             if (null === $user = $token->getUser()) {
                 return;
             }
-        } else if (null !== $this->security) {
+        } elseif (null !== $this->security) {
+            // Symfony Security Bundle <7
+            // Symfony\Component\Security\Core\Security exists since 7.
             $user = $this->security->getUser();
+        } else {
+            $user = null;
         }
 
         if ($user) {
-            $this->inspector->transaction()->withUser($user->getUserIdentifier());
+            $transaction = $this->inspector->transaction();
+            if (null === $transaction) {
+                return;
+            }
+
+            $transaction->withUser($user->getUserIdentifier());
         }
     }
 
@@ -261,7 +271,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      */
     public function onKernelException($event): void
     {
-        if (! $this->inspector->isRecording()) {
+        if (!$this->inspector->isRecording()) {
             return;
         }
         // Compatibility with Symfony < 5 and Symfony >=5
@@ -281,7 +291,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelTerminate(TerminateEvent $event): void
     {
-        if (!$this->isRequestEligibleForInspection($event)){
+        if (!$this->inspector->isRecording()){
             return;
         }
 

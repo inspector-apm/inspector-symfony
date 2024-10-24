@@ -6,27 +6,29 @@ use Doctrine\DBAL\Driver\Middleware\AbstractStatementMiddleware;
 use Doctrine\DBAL\Driver\Result as ResultInterface;
 use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\ParameterType;
-use Inspector\Symfony\Bundle\Inspectable\Doctrine\Middleware\InspectorSQLLogger;
+use Inspector\Symfony\Bundle\Inspectable\Doctrine\InspectorSQLSegmentTracer;
 
 /**
+ * Statement class for Doctrine DBAL3
+ *
  * @internal
  */
 class Statement extends AbstractStatementMiddleware
 {
-    /** @var InspectorSQLLogger */
-    protected $inspectorSQLLogger;
+    /** @var InspectorSQLSegmentTracer */
+    protected $inspectorSQLSegmentTracer;
 
     protected string $sql;
 
     public function __construct(
         StatementInterface $statement,
-        InspectorSQLLogger $inspectorSQLLogger,
+        InspectorSQLSegmentTracer $inspectorSQLSegmentTracer,
         string $sql
     ) {
         parent::__construct($statement);
 
-        $this->inspectorSQLLogger = $inspectorSQLLogger;
-        $this->sql = $sql;
+        $this->inspectorSQLSegmentTracer = $inspectorSQLSegmentTracer;
+        $this->sql                       = $sql;
     }
 
     public function bindParam($param, &$variable, $type = ParameterType::STRING, $length = null): bool
@@ -41,12 +43,12 @@ class Statement extends AbstractStatementMiddleware
 
     public function execute($params = null): ResultInterface
     {
-        $this->inspectorSQLLogger->startQuery($this->sql, $params);
+        $this->inspectorSQLSegmentTracer->startQuery($this->sql, $params);
 
         try {
             return parent::execute($params);
         } finally {
-            $this->inspectorSQLLogger->stopQuery();
+            $this->inspectorSQLSegmentTracer->stopQuery();
         }
     }
 }

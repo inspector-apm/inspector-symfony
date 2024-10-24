@@ -5,11 +5,12 @@ namespace Inspector\Symfony\Bundle\Inspectable\Doctrine\Middleware;
 use Doctrine\DBAL\Driver as DriverInterface;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
 use Inspector\Inspector;
+use Inspector\Symfony\Bundle\Inspectable\Doctrine\InspectorSQLSegmentTracer;
 
 class InspectorMiddleware implements MiddlewareInterface
 {
-    /** @var InspectorSQLLogger */
-    protected $inspectorSQLLogger;
+    /** @var InspectorSQLSegmentTracer */
+    protected $inspectorSQLSegmentTracer;
 
     /**
      * InspectorMiddleware constructor.
@@ -23,7 +24,7 @@ class InspectorMiddleware implements MiddlewareInterface
         array $configuration,
         string $connectionName
     ) {
-        $this->inspectorSQLLogger = new InspectorSQLLogger(
+        $this->inspectorSQLSegmentTracer = new InspectorSQLSegmentTracer(
             $inspector,
             $configuration,
             $connectionName
@@ -34,7 +35,7 @@ class InspectorMiddleware implements MiddlewareInterface
     {
         return new InspectorDriver(
             $driver,
-            $this->inspectorSQLLogger
+            $this->inspectorSQLSegmentTracer
         );
     }
 }

@@ -57,7 +57,10 @@ class InspectorExtension extends Extension
         /*
          * Kernel events subscriber: request, response etc.
          */
+        // Determine if it's on Symfony Security Bundle >= 7 or <= 6.
         if (class_exists(Security::class)) {
+            // Symfony Security Bundle <= 6
+            // Symfony\Component\Security\Core\Security exists since 7.
             $kernelEventsSubscriberDefinition = new Definition(KernelEventsSubscriber::class, [
                 new Reference(Inspector::class),
                 new Reference(RouterInterface::class),
@@ -65,12 +68,22 @@ class InspectorExtension extends Extension
                 null,
                 $config['ignore_routes']
             ]);
-        } else {
+        } elseif (class_exists(TokenStorageInterface::class)) {
+            // Symfony Security Bundle >= 7
             $kernelEventsSubscriberDefinition = new Definition(KernelEventsSubscriber::class, [
                 new Reference(Inspector::class),
                 new Reference(RouterInterface::class),
                 null,
                 new Reference(TokenStorageInterface::class),
+                $config['ignore_routes']
+            ]);
+        } else {
+            // No Symfony Security Bundle
+            $kernelEventsSubscriberDefinition = new Definition(KernelEventsSubscriber::class, [
+                new Reference(Inspector::class),
+                new Reference(RouterInterface::class),
+                null,
+                null,
                 $config['ignore_routes']
             ]);
         }
