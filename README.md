@@ -12,8 +12,8 @@ Code Execution Monitoring for Symfony applications.
 - [Requirements](#requirements)
 - [Install](#install)
 - [Configure the INGESTION key](#key)
+- [Test & Deploy](#deploy)
 - [Official Documentation](https://docs.inspector.dev/symfony)
-- [Contribution Guidelines](#contribution)
 
 <a name="requirements"></a>
 
@@ -32,22 +32,33 @@ Install the latest version of the bundle:
 composer require inspector-apm/inspector-symfony
 ```
 
-## Recipe (recommended)
-
-You will be prompted to run the recipe. It will autoconfigure the package for you
-creating the necessary environment variable and `inspector.yaml` configuration file.
-
-<a name="key"></a>
-
 ## Configure the INGESTION Key
 
 You can obtain the `ingestion key` creating a new project in your [Inspector](https://app.inspector.dev) dashboard.
 
 ```dotenv
-###> inspector-apm/inspector-symfony ###
 INSPECTOR_INGESTION_KEY=895d9e6dxxxxxxxxxxxxxxxxx
-###< inspector-apm/inspector-symfony ###
 ```
+
+<a name="deploy"></a>
+
+## Test & Deploy
+Execute the Symfony command below to check if your app can send data to inspector correctly:
+
+```
+php bin/console inspector:test
+```
+
+Go to https://app.inspector.dev/home to explore your data.
+
+Inspector monitors many components by default:
+
+- HTTP requests
+- Console commands
+- SQL queries
+- Twig views rendering
+
+But you have several configuration parameters to customize its behavior. Check out the official documentation below.
 
 ## Official documentation
 
