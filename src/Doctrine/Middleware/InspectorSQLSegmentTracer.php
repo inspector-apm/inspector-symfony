@@ -43,7 +43,7 @@ class InspectorSQLSegmentTracer
             return;
         }
 
-        $this->segment = $this->inspector->startSegment($this->connectionName, $sql);
+        $this->segment = $this->inspector->startSegment("doctrine:{$this->connectionName}", $sql);
 
         $context = ['sql' => $sql];
 
