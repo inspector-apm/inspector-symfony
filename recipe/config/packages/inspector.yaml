@@ -57,3 +57,7 @@ inspector:
         - 'make:user'
         - 'make:validator'
         - 'make:voter'
+        - 'schedule:run'
+        - 'assets:install'
+        - 'cache:clear'
+        - 'doctrine:migration:migrate'

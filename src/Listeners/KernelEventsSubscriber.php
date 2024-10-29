@@ -3,7 +3,6 @@
 namespace Inspector\Symfony\Bundle\Listeners;
 
 use Inspector\Inspector;
-use Inspector\Models\Segment;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
