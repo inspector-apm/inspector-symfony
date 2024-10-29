@@ -131,7 +131,7 @@ class InspectorTestCommand extends Command
         // Report a bad query
         $this->inspector->addSegment(function () {
             sleep(1);
-        }, 'mysql', "SELECT name, (SELECT COUNT(*) FROM orders WHERE user_id = users.id) AS order_count FROM users");
+        }, 'doctrine:default', "SELECT name, (SELECT COUNT(*) FROM orders WHERE user_id = users.id) AS order_count FROM users");
 
         // Report Exception
         $this->inspector->reportException(new \Exception('First Exception detected'));

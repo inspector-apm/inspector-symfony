@@ -22,7 +22,7 @@ class InspectorExtension extends Extension
     /**
      * Current version of the bundle.
      */
-    const VERSION = '1.2.4';
+    const VERSION = '1.2.5';
 
     /**
      * Loads a specific configuration.
