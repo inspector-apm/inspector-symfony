@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Security;
@@ -38,7 +39,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     /**
      * @var string
      */
-    protected $routeName;
+    protected $routePath;
 
     /**
      * @var RouterInterface
@@ -109,7 +110,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelController(ControllerEvent $event): void
     {
-        if (!$this->isRequestEligibleForInspection($event)){
+        if (! $this->inspector->canAddSegments()) {
             return;
         }
 
@@ -121,7 +122,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelPreControllerArguments(ControllerArgumentsEvent $event): void
     {
-        if (!$this->isRequestEligibleForInspection($event)){
+        if (! $this->inspector->canAddSegments()) {
             return;
         }
 
@@ -133,7 +134,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelPostControllerArguments(ControllerArgumentsEvent $event): void
     {
-        if (!$this->isRequestEligibleForInspection($event)){
+        if (! $this->inspector->canAddSegments()) {
             return;
         }
 
@@ -168,20 +169,29 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$this->isRequestEligibleForInspection($event)) {
+        $request = $event->getRequest();
+
+        // Retrieve the route pattern
+        try {
+            $routeInfo = $this->router->match($request->getPathInfo());
+            $route = $this->router->getRouteCollection()->get($routeInfo['_route']);
+
+            // If the route is not in the route collection, $route could be null.
+            if ($route instanceof Route) {
+                $this->routePath = $route->getPath();
+            } else {
+                $this->routePath = $request->getPathInfo();
+            }
+
+        } catch (\Throwable $exception) {
+            $this->routePath = $request->getPathInfo();
+        }
+
+        if (!$this->isRequestEligibleForInspection($this->routePath)) {
             return;
         }
 
-        $request = $event->getRequest();
-
-        try {
-            $routeInfo = $this->router->match($request->getPathInfo());
-            $this->routeName = $routeInfo['_route'];
-        } catch (\Throwable $exception) {
-            $this->routeName = $request->getPathInfo();
-        }
-
-        $this->startTransaction($event->getRequest()->getMethod() . ' /' . \trim($this->routeName, '/'))
+        $this->startTransaction($event->getRequest()->getMethod() . ' /' . \trim($this->routePath, '/'))
             ->markAsRequest();
 
         $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::REQUEST);
@@ -189,7 +199,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function setAuthUserInfo(RequestEvent $event): void
     {
-        if (! $this->inspector->isRecording()) {
+        if (! $this->inspector->hasTransaction()) {
             return;
         }
 
@@ -225,15 +235,11 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if (!$this->isRequestEligibleForInspection($event)){
+        if (!$this->inspector->canAddSegments()) {
             return;
         }
 
-        if (!$this->inspector->isRecording()) {
-            return;
-        }
-
-        // End segment based on kernel event type
+        // End segment based on a kernel event type
         $controllerLabel = $this->controllerLabel($event);
         if ($controllerLabel) {
             $this->endSegment($controllerLabel);
@@ -254,11 +260,9 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelFinishRequest(FinishRequestEvent $event): void
     {
-        if (!$this->isRequestEligibleForInspection($event)){
-            return;
+        if (!$this->inspector->canAddSegments()) {
+            $this->endSegment(KernelEvents::RESPONSE);
         }
-
-        $this->endSegment(KernelEvents::RESPONSE);
     }
 
     /**
@@ -273,6 +277,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         if (!$this->inspector->isRecording()) {
             return;
         }
+
         // Compatibility with Symfony < 5 and Symfony >=5
         // The additional `method_exists` check is to prevent errors in Symfony 4.3
         // where the ExceptionEvent exists and is used but doesn't implement
@@ -290,7 +295,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelTerminate(TerminateEvent $event): void
     {
-        if (!$this->inspector->isRecording()){
+        if (!$this->inspector->hasTransaction()){
             return;
         }
 
@@ -299,7 +304,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelView(ViewEvent $event): void
     {
-        if (!$this->isRequestEligibleForInspection($event)){
+        if (!$this->inspector->canAddSegments()){
             return;
         }
 
@@ -314,13 +319,27 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     // TODO: use trait for compatibility isMaster/isMain
     // TODO: track sub requests?
-    protected function isRequestEligibleForInspection(KernelEvent $event): bool
+    protected function isRequestEligibleForInspection($path): bool
     {
-        $route = $event->getRequest()->attributes->get('_route') ?: $this->routeName;
+        foreach ($this->ignoredRoutes as $pattern) {
+            if ($this->matchUrlWithWildcard($pattern, $path)) {
+                return false;
+            }
+        }
 
-        return $this->isMasterMainRequest($event)
-            && !\in_array($route, $this->ignoredRoutes)
-            && $this->inspector->isRecording();
+        return true;
+    }
+
+    public function matchUrlWithWildcard(string $pattern, string $url): bool
+    {
+        // Escape special regex characters in the pattern, except for '*'.
+        $escapedPattern = preg_quote($pattern, '/');
+
+        // Replace '*' in the pattern with '.*' for regex matching.
+        $regex = '/^' . str_replace('\*', '.*', $escapedPattern) . '$/';
+
+        // Perform regex match.
+        return (bool)preg_match($regex, $url);
     }
 
     private function controllerLabel(KernelEvent $event): ?string
