@@ -23,8 +23,12 @@ inspector:
         - '_profiler_exception_css'
     ignore_commands:
         - 'messenger:consume'
-        # Development commands section
+        - 'assets:install'
         - 'cache:clear'
+        - 'doctrine:migration:migrate'
+        - 'schedule:run'
+
+        # Development commands section
         - 'debug:autowiring'
         - 'debug:config'
         - 'debug:container'
@@ -57,7 +61,3 @@ inspector:
         - 'make:user'
         - 'make:validator'
         - 'make:voter'
-        - 'schedule:run'
-        - 'assets:install'
-        - 'cache:clear'
-        - 'doctrine:migration:migrate'
