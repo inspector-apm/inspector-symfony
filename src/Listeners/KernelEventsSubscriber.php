@@ -235,7 +235,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if (!$this->inspector->canAddSegments()) {
+        if (!$this->inspector->canAddSegments() && $this->isMasterMainRequest($event)) {
             return;
         }
 
@@ -260,7 +260,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelFinishRequest(FinishRequestEvent $event): void
     {
-        if (!$this->inspector->canAddSegments()) {
+        if (!$this->inspector->canAddSegments() && $this->isMasterMainRequest($event)) {
             $this->endSegment(KernelEvents::RESPONSE);
         }
     }
@@ -304,7 +304,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelView(ViewEvent $event): void
     {
-        if (!$this->inspector->canAddSegments()){
+        if (!$this->inspector->canAddSegments() && $this->isMasterMainRequest($event)){
             return;
         }
 
