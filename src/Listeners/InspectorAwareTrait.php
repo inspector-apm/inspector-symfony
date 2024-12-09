@@ -21,22 +21,6 @@ trait InspectorAwareTrait
     protected $segments = [];
 
     /**
-     * Checks if segments can be added
-     */
-    protected function canAddSegments(): bool
-    {
-        return $this->inspector->canAddSegments();
-    }
-
-    /**
-     * Checks if transaction is needed
-     */
-    protected function needsTransaction(): bool
-    {
-        return $this->inspector->needTransaction();
-    }
-
-    /**
      * Be sure to start a transaction before report the exception.
      *
      * @throws \Exception
@@ -48,16 +32,6 @@ trait InspectorAwareTrait
         }
 
         return $this->inspector->transaction();
-    }
-
-    /**
-     * Report unexpected error to inspection API.
-     *
-     * @throws \Exception
-     */
-    protected function notifyUnexpectedError(Throwable $throwable): void
-    {
-        $this->inspector->reportException($throwable, false);
     }
 
     protected function startSegment(string $type, string $label = null): Segment

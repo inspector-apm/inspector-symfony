@@ -30,7 +30,7 @@ class InspectorSQLSegmentTracer
     }
 
     /**
-     * Trace a SQL statement.
+     * Trace an SQL statement.
      *
      * @param string $sql SQL statement
      * @param array<int, mixed>|array<string, mixed>|null $params Statement parameters
@@ -38,8 +38,7 @@ class InspectorSQLSegmentTracer
      */
     public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
-        // This check is needed as transaction is flushed in MessengerEventSubscriber
-        if (!$this->inspector->isRecording()) {
+        if (!$this->inspector->canAddSegments()) {
             return;
         }
 
@@ -60,8 +59,7 @@ class InspectorSQLSegmentTracer
      */
     public function stopQuery(): void
     {
-        // This check is needed as transaction is flushed in MessengerEventSubscriber
-        if (!$this->inspector->hasTransaction()) {
+        if (!$this->inspector->canAddSegments()) {
             return;
         }
 

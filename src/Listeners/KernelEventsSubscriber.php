@@ -290,7 +290,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             throw new \LogicException('Invalid exception event.');
         }
 
-        $this->notifyUnexpectedError($exception);
+        $this->inspector->reportException($exception, false);
     }
 
     public function onKernelTerminate(TerminateEvent $event): void

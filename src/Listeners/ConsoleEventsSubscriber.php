@@ -63,10 +63,13 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
     public function onConsoleStart(ConsoleCommandEvent $event): void
     {
         $command = $event->getCommand();
+
         if (null === $command || $this->isIgnored($command)) {
             return;
         }
+
         $commandName = $command->getName();
+
         if ($this->inspector->needTransaction()) {
             $this->inspector->startTransaction($commandName)
                 ->setType('command')
@@ -87,21 +90,24 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
     public function onConsoleError(ConsoleErrorEvent $event): void
     {
         $command = $event->getCommand();
+
         if (null === $command || $this->isIgnored($command) || ! $this->inspector->isRecording()) {
             return;
         }
 
-        $this->notifyUnexpectedError($event->getError());
+        $this->inspector->reportException($event->getError(), false);
     }
 
     public function onConsoleTerminate(ConsoleTerminateEvent $event): void
     {
         $command = $event->getCommand();
+
         if (null === $command || $this->isIgnored($command)) {
             return;
         }
 
         $commandName = $command->getName();
+
         if($this->inspector->hasTransaction() && $this->inspector->transaction()->name === $commandName) {
             $this->inspector->transaction()->setResult($event->getExitCode() === 0 ? 'success' : 'error');
         } elseif(\array_key_exists($commandName, $this->segments)) {
@@ -116,6 +122,7 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
     public function onConsoleSignal(ConsoleSignalEvent $event): void
     {
         $command = $event->getCommand();
+
         if (null === $command || $this->isIgnored($command)) {
             return;
         }
