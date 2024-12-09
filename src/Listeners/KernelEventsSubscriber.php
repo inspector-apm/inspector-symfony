@@ -165,7 +165,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      */
     public function onKernelRequest(RequestEvent $event): void
     {
-        if (! $this->isMasterMainRequest($event)) {
+        if (!$this->inspector->isRecording() || ! $this->isMasterMainRequest($event)) {
             return;
         }
 
@@ -235,7 +235,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if (!$this->inspector->canAddSegments() && !$this->isMasterMainRequest($event)) {
+        if (!$this->inspector->canAddSegments() || !$this->isMasterMainRequest($event)) {
             return;
         }
 
@@ -260,7 +260,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelFinishRequest(FinishRequestEvent $event): void
     {
-        if (!$this->inspector->canAddSegments() && $this->isMasterMainRequest($event)) {
+        if ($this->inspector->canAddSegments() && $this->isMasterMainRequest($event)) {
             $this->endSegment(KernelEvents::RESPONSE);
         }
     }
@@ -295,16 +295,14 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelTerminate(TerminateEvent $event): void
     {
-        if (!$this->inspector->hasTransaction()){
-            return;
+        if ($this->inspector->hasTransaction()){
+            $this->inspector->transaction()->setResult($event->getResponse()->getStatusCode());
         }
-
-        $this->inspector->transaction()->setResult($event->getResponse()->getStatusCode());
     }
 
     public function onKernelView(ViewEvent $event): void
     {
-        if (!$this->inspector->canAddSegments() && $this->isMasterMainRequest($event)){
+        if (!$this->inspector->canAddSegments() || $this->isMasterMainRequest($event)){
             return;
         }
 
