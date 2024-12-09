@@ -235,7 +235,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if (!$this->inspector->canAddSegments() && $this->isMasterMainRequest($event)) {
+        if (!$this->inspector->canAddSegments() && !$this->isMasterMainRequest($event)) {
             return;
         }
 
