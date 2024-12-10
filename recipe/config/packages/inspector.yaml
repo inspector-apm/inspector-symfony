@@ -1,17 +1,8 @@
 inspector:
     ingestion_key: '%env(INSPECTOR_INGESTION_KEY)%'
-    url: https://ingest.inspector.dev
-    enabled: true
-    unhandled_exceptions: true
-    messenger: true
-    query: true
-    query_bindings: false
-    user: true
-    templates: true
-    transport: async
     ignore_routes:
-        - '/wdt*'
-        - '/profiler*'
+        - '/_wdt*'
+        - '/_profiler*'
     ignore_commands:
         - 'messenger:consume'
         - 'assets:install'

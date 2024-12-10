@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Security;
@@ -22,13 +22,14 @@ class InspectorExtension extends Extension
     /**
      * Current version of the bundle.
      */
-    const VERSION = '1.3.5';
+    const VERSION = '1.3.6';
 
     /**
      * Loads a specific configuration.
      *
      * @throws \InvalidArgumentException|\Exception When provided tag is not defined in this extension
      */
+    #[\ReturnTypeWillChange]
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = $this->getConfiguration($configs, $container);
