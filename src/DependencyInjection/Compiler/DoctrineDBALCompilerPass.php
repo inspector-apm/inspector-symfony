@@ -23,7 +23,7 @@ class DoctrineDBALCompilerPass implements CompilerPassInterface
      * You can modify the container here before it is dumped to PHP code.
      */
     #[\ReturnTypeWillChange]
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $config = $container->getParameter('inspector.configuration.definition');
 
