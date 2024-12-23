@@ -34,7 +34,7 @@ trait InspectorAwareTrait
         return $this->inspector->transaction();
     }
 
-    protected function startSegment(string $type, string $label = null): Segment
+    protected function startSegment(string $type, ?string $label = null): Segment
     {
         $segment = $this->inspector->startSegment($type, $label);
 
