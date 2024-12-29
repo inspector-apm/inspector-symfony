@@ -3,6 +3,7 @@
 namespace Inspector\Symfony\Bundle\Listeners;
 
 use Inspector\Inspector;
+use Inspector\Symfony\Bundle\Filters;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -134,6 +135,12 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
 
     protected function isIgnored(Command $command): bool
     {
-        return \in_array($command->getName(), $this->ignoredCommands);
+        foreach ($this->ignoredCommands as $pattern) {
+            if (Filters::matchWithWildcard($pattern, $command->getName())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

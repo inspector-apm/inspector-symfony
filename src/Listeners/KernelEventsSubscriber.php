@@ -3,6 +3,7 @@
 namespace Inspector\Symfony\Bundle\Listeners;
 
 use Inspector\Inspector;
+use Inspector\Symfony\Bundle\Filters;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -320,24 +321,12 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     protected function isRequestEligibleForInspection($path): bool
     {
         foreach ($this->ignoredRoutes as $pattern) {
-            if ($this->matchUrlWithWildcard($pattern, $path)) {
+            if (Filters::matchWithWildcard($pattern, $path)) {
                 return false;
             }
         }
 
         return true;
-    }
-
-    public function matchUrlWithWildcard(string $pattern, string $url): bool
-    {
-        // Escape special regex characters in the pattern, except for '*'.
-        $escapedPattern = preg_quote($pattern, '/');
-
-        // Replace '*' in the pattern with '.*' for regex matching.
-        $regex = '/^' . str_replace('\*', '.*', $escapedPattern) . '$/';
-
-        // Perform regex match.
-        return (bool)preg_match($regex, $url);
     }
 
     private function controllerLabel(KernelEvent $event): ?string
