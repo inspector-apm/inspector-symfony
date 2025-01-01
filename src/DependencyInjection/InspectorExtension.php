@@ -29,7 +29,7 @@ class InspectorExtension extends Extension
      *
      * @throws \InvalidArgumentException|\Exception When provided tag is not defined in this extension
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
