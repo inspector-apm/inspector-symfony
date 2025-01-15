@@ -121,8 +121,7 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
                 ->addContext('Handlers', $handlers)
                 ->end();
         } else {
-            $this->inspector->transaction()
-                ->addContext('Handlers', $handlers);
+            $this->inspector->transaction()->addContext('Handlers', $handlers);
         }
 
         // todo: if we can know if it's sync or async we can call flush only for async.

@@ -155,8 +155,9 @@ class KernelEventsSubscriber implements EventSubscriberInterface
                 $arguments[] = $argument;
             }
         }
-        $segment = $this->startSegment(self::SEGMENT_TYPE_CONTROLLER, $controllerLabel);
-        $segment->addContext($controllerLabel, ['arguments' => $arguments]);
+
+        $this->startSegment(self::SEGMENT_TYPE_CONTROLLER, $controllerLabel)
+            ->addContext($controllerLabel, ['arguments' => $arguments]);
     }
 
     /**
