@@ -4,9 +4,11 @@
 namespace Inspector\Symfony\Bundle\Listeners;
 
 use Inspector\Inspector;
+use Inspector\Symfony\Bundle\Filters;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 class MessengerEventsSubscriber implements EventSubscriberInterface
@@ -17,13 +19,25 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
     protected $inspector;
 
     /**
+     * @var array
+     */
+    protected $ignoreMessages;
+
+    /**
+     * @var array
+     */
+    protected $segments = [];
+
+    /**
      * ConsoleEventsSubscriber constructor.
      *
      * @param Inspector $inspector
+     * @param array $ignoreMessages
      */
-    public function __construct(Inspector $inspector)
+    public function __construct(Inspector $inspector, array $ignoreMessages = [])
     {
         $this->inspector = $inspector;
+        $this->ignoreMessages = $ignoreMessages;
     }
 
     /**
@@ -33,9 +47,25 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
+            WorkerMessageReceivedEvent::class => 'onWorkerMessageReceived',
             WorkerMessageFailedEvent::class => 'onWorkerMessageFailed',
             WorkerMessageHandledEvent::class => 'onWorkerMessageHandled',
         ];
+    }
+
+    public function onWorkerMessageReceived(WorkerMessageReceivedEvent $event)
+    {
+        $class = get_class($event->getEnvelope()->getMessage());
+
+        if (!$this->inspector->isRecording() || !$this->shouldBeMonitored($class)) {
+            return;
+        }
+
+        if (!$this->inspector->hasTransaction() ) {
+            $this->inspector->startTransaction($class)->setType('message');
+        } elseif ($this->inspector->canAddSegments()) {
+            $this->segments[$class] = $this->inspector->startSegment('message', $class);
+        }
     }
 
     /**
@@ -46,13 +76,21 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
      */
     public function onWorkerMessageFailed(WorkerMessageFailedEvent $event)
     {
-        if (! $this->inspector->isRecording()) {
+        $class = get_class($event->getEnvelope()->getMessage());
+
+        if (! $this->inspector->isRecording() || !$this->shouldBeMonitored($class)) {
             return;
         }
 
-        // reportException will create a transaction if it doesn't exists.
         $this->inspector->reportException($event->getThrowable());
+
+        if (\array_key_exists($class, $this->segments)) {
+            $this->segments[$class]->end();
+        }
+
         $this->inspector->transaction()->setResult('error');
+
+        // todo: if we can know if it's sync or async we can call flush only for async.
         $this->inspector->flush();
     }
 
@@ -64,22 +102,41 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
      */
     public function onWorkerMessageHandled(WorkerMessageHandledEvent $event)
     {
-        if (!$this->inspector->hasTransaction()) {
+        $class = get_class($event->getEnvelope()->getMessage());
+
+        if (!$this->inspector->isRecording() || !$this->shouldBeMonitored($class)) {
             return;
         }
 
         $processedByStamps = $event->getEnvelope()->all(HandledStamp::class);
-        $processedBy = [];
+        $handlers = [];
 
         /** @var HandledStamp $handlerStamp */
         foreach ($processedByStamps as $handlerStamp) {
-            $processedBy[] = $handlerStamp->getHandlerName();
+            $handlers[] = $handlerStamp->getHandlerName();
         }
 
-        $this->inspector->transaction()
-            ->addContext('Handlers', $processedBy)
-            ->addContext('Envelope', \serialize($event->getEnvelope()));
+        if (\array_key_exists($class, $this->segments)) {
+            $this->segments[$class]
+                ->addContext('Handlers', $handlers)
+                ->end();
+        } else {
+            $this->inspector->transaction()
+                ->addContext('Handlers', $handlers);
+        }
 
+        // todo: if we can know if it's sync or async we can call flush only for async.
         $this->inspector->flush();
+    }
+
+    protected function shouldBeMonitored($message): bool
+    {
+        foreach ($this->ignoreMessages as $pattern) {
+            if (Filters::matchWithWildcard($pattern, $message)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

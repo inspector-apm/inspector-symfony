@@ -316,8 +316,6 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         $this->startSegment(self::SEGMENT_TYPE_TEMPLATE, KernelEvents::VIEW);
     }
 
-    // TODO: use trait for compatibility isMaster/isMain
-    // TODO: track sub requests?
     protected function isRequestEligibleForInspection($path): bool
     {
         foreach ($this->ignoredRoutes as $pattern) {

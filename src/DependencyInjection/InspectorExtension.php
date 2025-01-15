@@ -6,6 +6,7 @@ namespace Inspector\Symfony\Bundle\DependencyInjection;
 use Inspector\Inspector;
 use Inspector\Symfony\Bundle\Twig\TwigTracer;
 use Inspector\Symfony\Bundle\Listeners\ConsoleEventsSubscriber;
+use Inspector\Symfony\Bundle\Listeners\MessengerEventsSubscriber;
 use Inspector\Symfony\Bundle\Listeners\KernelEventsSubscriber;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -22,7 +23,7 @@ class InspectorExtension extends Extension
     /**
      * Current version of the bundle.
      */
-    const VERSION = '1.3.8';
+    const VERSION = '1.4.0';
 
     /**
      * Loads a specific configuration.
@@ -92,27 +93,27 @@ class InspectorExtension extends Extension
         $container->setDefinition(KernelEventsSubscriber::class, $kernelEventsSubscriberDefinition);
 
         /*
-         * todo: Connect the messenger event subscriber
-         */
-        /*if (interface_exists(MessageBusInterface::class) && true === $config['messenger']) {
-            $messengerEventsSubscriber = new Definition(MessengerEventsSubscriber::class, [
-                new Reference(Inspector::class)
-            ]);
-
-            $messengerEventsSubscriber->setPublic(false)->addTag('kernel.event_subscriber');
-            $container->setDefinition(MessengerEventsSubscriber::class, $messengerEventsSubscriber);
-        }*/
-
-        /*
          * Console events subscriber
          */
         $consoleEventsSubscriberDefinition = new Definition(ConsoleEventsSubscriber::class, [
             new Reference(Inspector::class),
             $config['ignore_commands'],
         ]);
-
         $consoleEventsSubscriberDefinition->setPublic(false)->addTag('kernel.event_subscriber');
         $container->setDefinition(ConsoleEventsSubscriber::class, $consoleEventsSubscriberDefinition);
+
+        /*
+         * Messenger event subscriber
+         */
+        if (interface_exists(\Symfony\Component\Messenger\MessageBusInterface::class) && true === $config['messenger']) {
+            $messengerEventsSubscriber = new Definition(MessengerEventsSubscriber::class, [
+                new Reference(Inspector::class),
+                $config['ignore_messages']??[]
+            ]);
+
+            $messengerEventsSubscriber->setPublic(false)->addTag('kernel.event_subscriber');
+            $container->setDefinition(MessengerEventsSubscriber::class, $messengerEventsSubscriber);
+        }
 
         /*
          * Twig

@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-		"php": ">=7.2.5",
+		"php": ">=7.4",
 		"inspector-apm/inspector-php": "^3.8",
         "symfony/config": "^4.4|^5.2|^6.0|^7.0",
         "symfony/dependency-injection": "^4.4|^5.2|^6.0|^7.0",
@@ -32,7 +32,7 @@
         "symfony/framework-bundle": "^4.4|^5.2|^6.0|^7.0",
         "phpunit/phpunit": "^9.5",
         "symfony/test-pack": "^1.0",
-        "symfony/messenger": "^4.4|^5.2|^6.0|^7.0"
+        "symfony/messenger": "^7.2"
     },
 	"autoload": {
         "psr-4": {

@@ -40,6 +40,22 @@ You can obtain the `ingestion key` creating a new project in your [Inspector](ht
 INSPECTOR_INGESTION_KEY=895d9e6dxxxxxxxxxxxxxxxxx
 ```
 
+## Monitor Symfony Messenger
+
+If you use the Symfony messenger component to run tasks asynchronously you could use the Inspector's middleware
+to enable monitoring of background jobs.
+
+Add the `MessengerMonitoringMiddleware` class to the `config/packages/messenger.yaml` file in the bus configuration:
+
+```yaml
+framework:
+    messenger:
+        buses:
+            messenger.bus.default:
+                middleware:
+                    - Inspector\Symfony\Bundle\Messenger\MessengerMonitoringMiddleware
+```
+
 <a name="deploy"></a>
 
 ## Test & Deploy
