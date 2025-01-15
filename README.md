@@ -49,7 +49,7 @@ Execute the Symfony command below to check if your app can send data to inspecto
 php bin/console inspector:test
 ```
 
-Go to https://app.inspector.dev/home to explore your data.
+Go to https://app.inspector.dev to explore your data.
 
 Inspector monitors many components by default:
 
@@ -62,7 +62,7 @@ But you have several configuration parameters to customize its behavior. Check o
 
 ## Official documentation
 
-**[Go to the official documentation](https://docs.inspector.dev/symfony)**
+**[Go to the official documentation](https://docs.inspector.dev/guides/symfony/installation)**
 
 <a name="contribution"></a>
 
