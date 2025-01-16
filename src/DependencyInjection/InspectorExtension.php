@@ -120,14 +120,12 @@ class InspectorExtension extends Extension
             $messengerMiddleware = new Definition(MessengerMonitoringMiddleware::class, [
                 new Reference(Inspector::class),
                 $config['ignore_messages'] ?? [],
-                new Reference('service_container')
+                new Reference('messenger.transport.async')
             ]);
 
-            $messengerMiddleware
-                ->addTag('container.service_subscriber')
-                ->addTag('messenger.middleware', [
-                    //'priority' => -100  // Lower priority to run after other middlewares
-                ]);
+            $messengerMiddleware->addTag('messenger.middleware', [
+                //'priority' => -100  // Lower priority to run after other middlewares
+            ]);
 
             $container->setDefinition(MessengerMonitoringMiddleware::class, $messengerMiddleware);
         }

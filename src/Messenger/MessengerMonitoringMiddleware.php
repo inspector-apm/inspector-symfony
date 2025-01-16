@@ -13,7 +13,7 @@ use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class MessengerMonitoringMiddleware implements MiddlewareInterface, ServiceSubscriberInterface
+class MessengerMonitoringMiddleware implements MiddlewareInterface
 {
     protected Inspector $inspector;
 
@@ -31,13 +31,6 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface, ServiceSubsc
         $this->inspector = $inspector;
         $this->ignoreMessages = $ignoreMessages;
         $this->transport = $transport;
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        return [
-            'messenger.transport.async' => '?' . TransportInterface::class,
-        ];
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
