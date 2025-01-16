@@ -12,6 +12,7 @@ use Inspector\Symfony\Bundle\Listeners\KernelEventsSubscriber;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -19,12 +20,33 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Security;
 
-class InspectorExtension extends Extension
+class InspectorExtension extends Extension implements PrependExtensionInterface
 {
     /**
      * Current version of the bundle.
      */
     const VERSION = '1.4.0';
+
+    public function prepend(ContainerBuilder $container)
+    {
+        // Only add messenger config if messenger is available
+        if (!interface_exists(\Symfony\Component\Messenger\MessageBusInterface::class)) {
+            return;
+        }
+
+        // Add messenger middleware configuration
+        $container->prependExtensionConfig('framework', [
+            'messenger' => [
+                'buses' => [
+                    'messenger.bus.default' => [
+                        'middleware' => [
+                            MessengerMonitoringMiddleware::class,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
 
     /**
      * Loads a specific configuration.
@@ -123,9 +145,9 @@ class InspectorExtension extends Extension
                 new Reference('messenger.transport.async')
             ]);
 
-            $messengerMiddleware->addTag('messenger.middleware', [
-                //'priority' => -100  // Lower priority to run after other middlewares
-            ]);
+            /*$messengerMiddleware->addTag('messenger.middleware', [
+                'priority' => -100  // Lower priority to run after other middlewares
+            ]);*/
 
             $container->setDefinition(MessengerMonitoringMiddleware::class, $messengerMiddleware);
         }
