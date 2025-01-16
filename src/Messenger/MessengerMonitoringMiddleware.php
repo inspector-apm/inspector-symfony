@@ -11,7 +11,6 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\TransportInterface;
-use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 class MessengerMonitoringMiddleware implements MiddlewareInterface
 {
@@ -39,17 +38,17 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
 
         try {
             // Before handling the message in sync mode
-            $this->handleSyncMessageBefore($message);
+            $this->beforeHandle($message);
 
             // Handle the message
             $envelope = $stack->next()->handle($envelope, $stack);
 
             // After handling the message in sync mode
-            $this->handleSyncMessageAfter($message, $envelope->all(HandledStamp::class));
+            $this->afterHandle($message, $envelope->all(HandledStamp::class));
 
             return $envelope;
         } catch (\Throwable $error) {
-            $this->handleSyncMessageError($message, $error);
+            $this->errorHandle($message, $error);
             throw $error;
         } finally {
             if ($this->isMessengerAsync()) {
@@ -61,7 +60,7 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
     /**
      * @throws \Exception
      */
-    protected function handleSyncMessageBefore($message): void
+    protected function beforeHandle($message): void
     {
         $class = get_class($message);
 
@@ -76,10 +75,10 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
         }
     }
 
-    protected function handleSyncMessageAfter($message, array $handlers): void
+    protected function afterHandle($message, array $handlers): void
     {
-        /** @var HandledStamp $handlerStamp */
         $h = [];
+        /** @var HandledStamp $handlerStamp */
         foreach ($handlers as $handlerStamp) {
             $h[] = $handlerStamp->getHandlerName();
         }
@@ -91,7 +90,7 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
         }
     }
 
-    protected function handleSyncMessageError($message, \Throwable $error): void
+    protected function errorHandle($message, \Throwable $error): void
     {
         // If it is an unhandled exception, it should be kept by the global handler.
         // So we don't need to do anything here.
