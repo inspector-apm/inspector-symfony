@@ -4,6 +4,7 @@
 namespace Inspector\Symfony\Bundle\DependencyInjection;
 
 use Inspector\Inspector;
+use Inspector\Symfony\Bundle\Messenger\MessengerMonitoringMiddleware;
 use Inspector\Symfony\Bundle\Twig\TwigTracer;
 use Inspector\Symfony\Bundle\Listeners\ConsoleEventsSubscriber;
 use Inspector\Symfony\Bundle\Listeners\MessengerEventsSubscriber;
@@ -105,7 +106,7 @@ class InspectorExtension extends Extension
         /*
          * Messenger event subscriber
          */
-        if (interface_exists(\Symfony\Component\Messenger\MessageBusInterface::class) && true === $config['messenger']) {
+        /*if (interface_exists(\Symfony\Component\Messenger\MessageBusInterface::class) && true === $config['messenger']) {
             $messengerEventsSubscriber = new Definition(MessengerEventsSubscriber::class, [
                 new Reference(Inspector::class),
                 $config['ignore_messages']??[],
@@ -114,6 +115,21 @@ class InspectorExtension extends Extension
 
             $messengerEventsSubscriber->setPublic(false)->addTag('kernel.event_subscriber');
             $container->setDefinition(MessengerEventsSubscriber::class, $messengerEventsSubscriber);
+        }*/
+        if (interface_exists(\Symfony\Component\Messenger\MessageBusInterface::class) && true === $config['messenger']) {
+            $messengerMiddleware = new Definition(MessengerMonitoringMiddleware::class, [
+                new Reference(Inspector::class),
+                $config['ignore_messages'] ?? [],
+                new Reference('service_container')
+            ]);
+
+            $messengerMiddleware
+                ->addTag('container.service_subscriber')
+                ->addTag('messenger.middleware', [
+                    //'priority' => -100  // Lower priority to run after other middlewares
+                ]);
+
+            $container->setDefinition(MessengerMonitoringMiddleware::class, $messengerMiddleware);
         }
 
         /*
