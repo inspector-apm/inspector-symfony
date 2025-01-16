@@ -1,18 +1,14 @@
 {
     "name": "inspector-apm/inspector-symfony",
     "description": "Code Execution Monitoring for Symfony applications.",
-    "keywords": ["monitoring", "php", "inspector", "symfony", "bundle"],
-    "homepage": "https://www.inspector.dev",
+    "keywords": ["monitoring", "php", "inspector", "symfony", "bundle", "error-tracking", "messenger-monitoring"],
+    "homepage": "https://inspector.dev",
     "license": "MIT",
     "type": "symfony-bundle",
     "authors": [
         {
             "name": "Valerio Barbera",
             "email": "valerio@inspector.dev"
-        },
-        {
-            "name": "Serhii Smirnov",
-            "email": "free.smilesrg@gmail.com"
         }
     ],
     "require": {
