@@ -34,21 +34,25 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        $message = $envelope->getMessage();
+        $class = get_class($envelope->getMessage());
+
+        if (!$this->inspector->isRecording() || $this->shouldBeIgnored($class)) {
+            return $stack->next()->handle($envelope, $stack);
+        }
 
         try {
             // Before handling the message in sync mode
-            $this->beforeHandle($message);
+            $this->beforeHandle($class);
 
             // Handle the message
             $envelope = $stack->next()->handle($envelope, $stack);
 
             // After handling the message in sync mode
-            $this->afterHandle($message, $envelope->all(HandledStamp::class));
+            $this->afterHandle($envelope->all(HandledStamp::class));
 
             return $envelope;
         } catch (\Throwable $error) {
-            $this->errorHandle($message, $error);
+            $this->errorHandle($error);
             throw $error;
         } finally {
             if ($this->segment instanceof Segment) {
@@ -63,14 +67,8 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
     /**
      * @throws \Exception
      */
-    protected function beforeHandle($message): void
+    protected function beforeHandle($class): void
     {
-        $class = get_class($message);
-
-        if (!$this->inspector->isRecording() || $this->shouldBeIgnored($class)) {
-            return;
-        }
-
         if (!$this->inspector->hasTransaction()) {
             $this->inspector->startTransaction($class)->setType('message');
         } elseif ($this->inspector->canAddSegments()) {
@@ -78,7 +76,7 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
         }
     }
 
-    protected function afterHandle($message, array $handlers): void
+    protected function afterHandle(array $handlers): void
     {
         $h = [];
         /** @var HandledStamp $handlerStamp */
@@ -95,7 +93,7 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
         }
     }
 
-    protected function errorHandle($message, \Throwable $error): void
+    protected function errorHandle(\Throwable $error): void
     {
         $this->inspector->reportException($error);
         $this->inspector->transaction()->setResult('error');

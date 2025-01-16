@@ -43,7 +43,7 @@ INSPECTOR_INGESTION_KEY=895d9e6dxxxxxxxxxxxxxxxxx
 <a name="deploy"></a>
 
 ## Test & Deploy
-Execute the Symfony command below to check if your app can send data to inspector correctly:
+Execute the Symfony command below to check if your app can send data to Inspector correctly:
 
 ```
 php bin/console inspector:test

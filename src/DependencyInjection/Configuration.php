@@ -28,6 +28,7 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('transport')->defaultValue('async')->end()
             ->arrayNode('ignore_routes')->scalarPrototype()->end()->end()
             ->arrayNode('ignore_commands')->scalarPrototype()->end()->end()
+            ->arrayNode('ignore_messages')->scalarPrototype()->end()->end()
             ->end();
 
         return $tree;
