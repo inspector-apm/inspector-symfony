@@ -95,20 +95,20 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
 
     protected function errorHandle(\Throwable $error): void
     {
-        $this->inspector->reportException($error);
+        $this->inspector->reportException($error, false);
         $this->inspector->transaction()->setResult('error');
     }
 
     /**
      * Determine if a message class should be monitored based on the package configuration.
      *
-     * @param $message
+     * @param $class
      * @return bool
      */
-    protected function shouldBeIgnored($message): bool
+    protected function shouldBeIgnored($class): bool
     {
         foreach ($this->ignoreMessages as $pattern) {
-            if (Filters::matchWithWildcard($pattern, $message)) {
+            if (Filters::matchWithWildcard($pattern, $class)) {
                 return true;
             }
         }
@@ -119,6 +119,7 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
     /**
      * Determine if messenger is configured as sync or async process.
      *
+     * @param Envelope $envelope
      * @return bool
      */
     protected function isAsync(Envelope $envelope): bool
