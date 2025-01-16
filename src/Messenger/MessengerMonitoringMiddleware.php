@@ -9,6 +9,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
@@ -20,7 +21,7 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
 
     protected TransportInterface $transport;
 
-    protected Segment $segment;
+    protected ?Segment $segment = null;
 
     public function __construct(
         Inspector $inspector,
@@ -51,7 +52,10 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
             $this->errorHandle($message, $error);
             throw $error;
         } finally {
-            if ($this->isMessengerAsync()) {
+            if ($this->segment instanceof Segment) {
+                $this->segment->end();
+            }
+            if ($this->isAsync($envelope)) {
                 $this->inspector->flush();
             }
         }
@@ -86,14 +90,16 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
         if ($this->segment instanceof Segment) {
             $this->segment->addContext('Handlers', $h);
         } else {
-            $this->inspector->transaction()->addContext('Handlers', $h);
+            $this->inspector->transaction()
+                ->addContext('Handlers', $h)
+                ->setResult('success');
         }
     }
 
     protected function errorHandle($message, \Throwable $error): void
     {
-        // If it is an unhandled exception, it should be kept by the global handler.
-        // So we don't need to do anything here.
+        $this->inspector->reportException($error);
+        $this->inspector->transaction()->setResult('error');
     }
 
     /**
@@ -118,8 +124,8 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
      *
      * @return bool
      */
-    protected function isMessengerAsync(): bool
+    protected function isAsync(Envelope $envelope): bool
     {
-        return ! $this->transport instanceof InMemoryTransport;
+        return $envelope->last(ReceivedStamp::class) !== null;
     }
 }
