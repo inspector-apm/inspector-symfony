@@ -57,6 +57,7 @@ Inspector monitors many components by default:
 - Console commands
 - SQL queries
 - Twig views rendering
+- Background Messenger processing
 
 But you have several configuration parameters to customize its behavior. Check out the official documentation below.
 
