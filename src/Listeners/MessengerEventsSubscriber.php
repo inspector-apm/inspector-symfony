@@ -10,37 +10,31 @@ use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use Symfony\Component\Messenger\Transport\TransportInterface;
 
 class MessengerEventsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Inspector
-     */
-    protected $inspector;
+    protected Inspector $inspector;
 
-    /**
-     * @var array
-     */
-    protected $ignoreMessages;
+    protected array $ignoreMessages;
 
-    /**
-     * @var array
-     */
+    private TransportInterface $transport;
+
     protected $segments = [];
 
-    /**
-     * ConsoleEventsSubscriber constructor.
-     *
-     * @param Inspector $inspector
-     * @param array $ignoreMessages
-     */
-    public function __construct(Inspector $inspector, array $ignoreMessages = [])
-    {
+    public function __construct(
+        Inspector $inspector,
+        array $ignoreMessages,
+        TransportInterface  $transport
+    ) {
         $this->inspector = $inspector;
         $this->ignoreMessages = $ignoreMessages;
+        $this->transport = $transport;
     }
 
     /**
+     * @uses onWorkerMessageReceived
      * @uses onWorkerMessageFailed
      * @uses onWorkerMessageHandled
      */
@@ -90,8 +84,9 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
 
         $this->inspector->transaction()->setResult('error');
 
-        // todo: if we can know if it's sync or async we can call flush only for async.
-        $this->inspector->flush();
+        if ($this->isMessengerAsync()) {
+            $this->inspector->flush();
+        }
     }
 
     /**
@@ -124,10 +119,17 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
             $this->inspector->transaction()->addContext('Handlers', $handlers);
         }
 
-        // todo: if we can know if it's sync or async we can call flush only for async.
-        $this->inspector->flush();
+        if ($this->isMessengerAsync()) {
+            $this->inspector->flush();
+        }
     }
 
+    /**
+     * Determine if a message class should be monitored based on the package configuration.
+     *
+     * @param $message
+     * @return bool
+     */
     protected function shouldBeMonitored($message): bool
     {
         foreach ($this->ignoreMessages as $pattern) {
@@ -137,5 +139,15 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
         }
 
         return true;
+    }
+
+    /**
+     * Determine if messenger is configured as sync or async process.
+     *
+     * @return bool
+     */
+    protected function isMessengerAsync(): bool
+    {
+        return ! $this->transport instanceof InMemoryTransport;
     }
 }

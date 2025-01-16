@@ -108,7 +108,8 @@ class InspectorExtension extends Extension
         if (interface_exists(\Symfony\Component\Messenger\MessageBusInterface::class) && true === $config['messenger']) {
             $messengerEventsSubscriber = new Definition(MessengerEventsSubscriber::class, [
                 new Reference(Inspector::class),
-                $config['ignore_messages']??[]
+                $config['ignore_messages']??[],
+                new Reference('messenger.transport.async')
             ]);
 
             $messengerEventsSubscriber->setPublic(false)->addTag('kernel.event_subscriber');
