@@ -59,40 +59,40 @@ class Connection extends AbstractConnectionMiddleware
         }
     }
 
-    public function beginTransaction(): bool
+    public function beginTransaction(): void
     {
         if (1 === ++$this->nestingLevel) {
             $this->inspectorSQLSegmentTracer->startQuery('START TRANSACTION');
         }
 
         try {
-            return parent::beginTransaction();
+            parent::beginTransaction();
         } finally {
             $this->inspectorSQLSegmentTracer->stopQuery();
         }
     }
 
-    public function commit(): bool
+    public function commit(): void
     {
         if (1 === $this->nestingLevel--) {
             $this->inspectorSQLSegmentTracer->startQuery('COMMIT');
         }
 
         try {
-            return parent::commit();
+            parent::commit();
         } finally {
             $this->inspectorSQLSegmentTracer->stopQuery();
         }
     }
 
-    public function rollBack(): bool
+    public function rollBack(): void
     {
         if (1 === $this->nestingLevel--) {
             $this->inspectorSQLSegmentTracer->startQuery('ROLLBACK');
         }
 
         try {
-            return parent::rollBack();
+            parent::rollBack();
         } finally {
             $this->inspectorSQLSegmentTracer->stopQuery();
         }

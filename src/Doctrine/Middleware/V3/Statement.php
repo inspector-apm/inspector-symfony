@@ -36,9 +36,9 @@ class Statement extends AbstractStatementMiddleware
         return parent::bindParam($param, $variable, $type, ...\array_slice(\func_get_args(), 3));
     }
 
-    public function bindValue($param, $value, $type = ParameterType::STRING): bool
+    public function bindValue($param, $value, $type = ParameterType::STRING): void
     {
-        return parent::bindValue($param, $value, $type);
+        parent::bindValue($param, $value, $type);
     }
 
     public function execute($params = null): ResultInterface

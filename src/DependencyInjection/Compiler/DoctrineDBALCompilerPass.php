@@ -53,7 +53,7 @@ class DoctrineDBALCompilerPass implements CompilerPassInterface
                     $name
                 ]);
                 $middlewareDefinitionName = sprintf('doctrine.dbal.inspector_middleware.%s', $name);
-                $inspectorMiddlewareDefinition->addTag('doctrine.middleware', ['connections' => [$name]]);
+                $inspectorMiddlewareDefinition->addTag('doctrine.middleware', ['connection' => $name]);
                 $container->setDefinition($middlewareDefinitionName, $inspectorMiddlewareDefinition);
             }
 
