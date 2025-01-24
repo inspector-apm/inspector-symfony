@@ -10,7 +10,6 @@ use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
-use Symfony\Component\Messenger\Transport\TransportInterface;
 
 class MessengerMonitoringMiddleware implements MiddlewareInterface
 {
@@ -18,18 +17,14 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
 
     protected array $ignoreMessages;
 
-    protected TransportInterface $transport;
-
     protected ?Segment $segment = null;
 
     public function __construct(
         Inspector $inspector,
-        array $ignoreMessages,
-        TransportInterface  $transport
+        array $ignoreMessages
     ) {
         $this->inspector = $inspector;
         $this->ignoreMessages = $ignoreMessages;
-        $this->transport = $transport;
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope

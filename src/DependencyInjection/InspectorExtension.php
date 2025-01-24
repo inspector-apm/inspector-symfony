@@ -7,7 +7,6 @@ use Inspector\Inspector;
 use Inspector\Symfony\Bundle\Messenger\MessengerMonitoringMiddleware;
 use Inspector\Symfony\Bundle\Twig\TwigTracer;
 use Inspector\Symfony\Bundle\Listeners\ConsoleEventsSubscriber;
-use Inspector\Symfony\Bundle\Listeners\MessengerEventsSubscriber;
 use Inspector\Symfony\Bundle\Listeners\KernelEventsSubscriber;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,7 +24,7 @@ class InspectorExtension extends Extension implements PrependExtensionInterface
     /**
      * Current version of the bundle.
      */
-    const VERSION = '1.6.0';
+    const VERSION = '1.7.0';
 
     public function prepend(ContainerBuilder $container)
     {
@@ -141,8 +140,7 @@ class InspectorExtension extends Extension implements PrependExtensionInterface
         if (interface_exists(\Symfony\Component\Messenger\MessageBusInterface::class) && true === $config['messenger']) {
             $messengerMiddleware = new Definition(MessengerMonitoringMiddleware::class, [
                 new Reference(Inspector::class),
-                $config['ignore_messages'] ?? [],
-                new Reference('messenger.transport.async')
+                $config['ignore_messages'] ?? []
             ]);
 
             /*$messengerMiddleware->addTag('messenger.middleware', [
