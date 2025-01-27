@@ -26,7 +26,7 @@ class InspectorExtension extends Extension implements PrependExtensionInterface
      */
     const VERSION = '1.7.0';
 
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         // Only add messenger config if messenger is available
         if (!interface_exists(\Symfony\Component\Messenger\MessageBusInterface::class)) {
@@ -53,7 +53,7 @@ class InspectorExtension extends Extension implements PrependExtensionInterface
      * @throws \InvalidArgumentException|\Exception When provided tag is not defined in this extension
      */
     #[\ReturnTypeWillChange]
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
