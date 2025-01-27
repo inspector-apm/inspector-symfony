@@ -24,7 +24,7 @@ class InspectorExtension extends Extension implements PrependExtensionInterface
     /**
      * Current version of the bundle.
      */
-    const VERSION = '1.7.0';
+    const VERSION = '1.7.1';
 
     public function prepend(ContainerBuilder $container): void
     {
