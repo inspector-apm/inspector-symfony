@@ -6,6 +6,9 @@ use Inspector\Inspector;
 use Inspector\Models\Segment;
 use Inspector\Symfony\Bundle\Filters;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\WrappedExceptionsInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
@@ -36,13 +39,13 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
         }
 
         try {
-            // Before handling the message in sync mode
+            // Before handling the message
             $this->beforeHandle($class);
 
             // Handle the message
             $envelope = $stack->next()->handle($envelope, $stack);
 
-            // After handling the message in sync mode
+            // After handling the message
             $this->afterHandle($envelope->all(HandledStamp::class));
 
             return $envelope;
@@ -88,9 +91,25 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
         }
     }
 
-    protected function errorHandle(\Throwable $error): void
+    protected function errorHandle(\Throwable $exception): void
     {
-        $this->inspector->reportException($error, false);
+        if ($exception instanceof WrappedExceptionsInterface) {
+            $exception = $exception->getWrappedExceptions();
+        } elseif ($exception instanceof HandlerFailedException && \method_exists($exception, 'getNestedExceptions')) {
+            $exception = $exception->getNestedExceptions();
+        } elseif ($exception instanceof DelayedMessageHandlingException && \method_exists($exception, 'getExceptions')) {
+            $exception = $exception->getExceptions();
+        }
+
+        if (\is_array($exception)) {
+            foreach ($exception as $nestedException) {
+                $this->errorHandle($nestedException);
+            }
+
+            return;
+        }
+
+        $this->inspector->reportException($exception, false);
         $this->inspector->transaction()->setResult('error');
     }
 

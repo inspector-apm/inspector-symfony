@@ -63,13 +63,11 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
      */
     public function onConsoleStart(ConsoleCommandEvent $event): void
     {
-        $command = $event->getCommand();
+        $commandName = $event->getCommand()?->getName();
 
-        if (null === $command || $this->isIgnored($command)) {
+        if (null === $commandName || $this->isIgnored($commandName)) {
             return;
         }
-
-        $commandName = $command->getName();
 
         if ($this->inspector->needTransaction()) {
             $this->inspector->startTransaction($commandName)
@@ -90,9 +88,9 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
      */
     public function onConsoleError(ConsoleErrorEvent $event): void
     {
-        $command = $event->getCommand();
+        $commandName = $event->getCommand()?->getName();
 
-        if (null === $command || $this->isIgnored($command) || ! $this->inspector->isRecording()) {
+        if (null === $commandName || $this->isIgnored($commandName) || ! $this->inspector->isRecording()) {
             return;
         }
 
@@ -101,13 +99,11 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
 
     public function onConsoleTerminate(ConsoleTerminateEvent $event): void
     {
-        $command = $event->getCommand();
+        $commandName = $event->getCommand()?->getName();
 
-        if (null === $command || $this->isIgnored($command)) {
+        if (null === $commandName || $this->isIgnored($commandName)) {
             return;
         }
-
-        $commandName = $command->getName();
 
         if($this->inspector->hasTransaction() && $this->inspector->transaction()->name === $commandName) {
             $this->inspector->transaction()->setResult($event->getExitCode() === 0 ? 'success' : 'error');
@@ -122,9 +118,9 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
 
     public function onConsoleSignal(ConsoleSignalEvent $event): void
     {
-        $command = $event->getCommand();
+        $commandName = $event->getCommand()?->getName();
 
-        if (null === $command || $this->isIgnored($command)) {
+        if (null === $commandName || $this->isIgnored($commandName)) {
             return;
         }
 
@@ -133,10 +129,10 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
         }
     }
 
-    protected function isIgnored(Command $command): bool
+    protected function isIgnored(string $command): bool
     {
         foreach ($this->ignoredCommands as $pattern) {
-            if (Filters::matchWithWildcard($pattern, $command->getName())) {
+            if (Filters::matchWithWildcard($pattern, $command)) {
                 return true;
             }
         }
