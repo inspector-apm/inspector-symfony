@@ -157,7 +157,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         }
 
         $this->startSegment(self::SEGMENT_TYPE_CONTROLLER, $controllerLabel)
-            ->addContext($controllerLabel, ['arguments' => $arguments]);
+            ->addContext('Data', ['arguments' => $arguments]);
     }
 
     /**
@@ -252,12 +252,12 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         $response = $event->getResponse();
 
         $segment = $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::RESPONSE);
-        $segment->addContext(KernelEvents::RESPONSE, ['response' => [
+        $segment->addContext('Response', [
             'headers' => $response->headers->all(),
             'protocolVersion' => $response->getProtocolVersion(),
             'statusCode' => $response->getStatusCode(),
             'charset' => $response->getCharset(),
-        ]]);
+        ]);
     }
 
     public function onKernelFinishRequest(FinishRequestEvent $event): void
