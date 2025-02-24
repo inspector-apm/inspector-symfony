@@ -118,7 +118,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         $this->endSegment(KernelEvents::REQUEST);
 
         $this->startSegment(self::SEGMENT_TYPE_CONTROLLER, KernelEvents::CONTROLLER)
-            ->addContext('Description', KernelEvents::CONTROLLER." event occurs once a controller was found for handling a request.");
+            ->addContext("Controller",['class' => $event->getController()]);
     }
 
     public function onKernelPreControllerArguments(ControllerArgumentsEvent $event): void
@@ -130,7 +130,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         $this->endSegment(KernelEvents::CONTROLLER);
 
         $this->startSegment(self::SEGMENT_TYPE_CONTROLLER, KernelEvents::CONTROLLER_ARGUMENTS)
-            ->addContext('Description', KernelEvents::CONTROLLER_ARGUMENTS." event occurs once controller arguments have been resolved.");
+            ->addContext("Controller", ['class' => $event->getController(), 'arguments' => $event->getArguments()]);
     }
 
     public function onKernelPostControllerArguments(ControllerArgumentsEvent $event): void
