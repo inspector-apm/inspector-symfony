@@ -5,9 +5,11 @@ namespace Inspector\Symfony\Bundle\DependencyInjection;
 
 use Inspector\Inspector;
 use Inspector\Symfony\Bundle\Messenger\MessengerMonitoringMiddleware;
+use Inspector\Symfony\Bundle\NeuronAI\AgentMonitoring;
 use Inspector\Symfony\Bundle\Twig\TwigTracer;
 use Inspector\Symfony\Bundle\Listeners\ConsoleEventsSubscriber;
 use Inspector\Symfony\Bundle\Listeners\KernelEventsSubscriber;
+use NeuronAI\AgentInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
