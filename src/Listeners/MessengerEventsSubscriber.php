@@ -58,7 +58,7 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
         if (!$this->inspector->hasTransaction() ) {
             $this->inspector->startTransaction($class)->setType('message');
         } elseif ($this->inspector->canAddSegments()) {
-            $this->segments[$class] = $this->inspector->startSegment('message', $class);
+            $this->segments[$class] = $this->inspector->startSegment('job.message', $class);
         }
     }
 

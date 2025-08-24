@@ -49,7 +49,7 @@ final class TwigTracer extends AbstractExtension
         $label = $this->getLabelTitle($profile);
 
         if ($profile->isRoot() || $profile->isTemplate()) {
-            $this->segments[$profile->getTemplate()] = $this->inspector->startSegment('twig', $label);
+            $this->segments[$profile->getTemplate()] = $this->inspector->startSegment('view.twig', $label);
         }
     }
 

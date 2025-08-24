@@ -76,7 +76,7 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
                     'options' => $event->getInput()->getOptions(),
                 ]);
         } elseif ($this->inspector->canAddSegments()) {
-            $this->segments[$commandName] = $this->inspector->startSegment('command', $commandName);
+            $this->segments[$commandName] = $this->inspector->startSegment('cli.command', $commandName);
         }
     }
 

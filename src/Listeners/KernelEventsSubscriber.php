@@ -30,7 +30,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     protected const SEGMENT_TYPE_CONTROLLER = 'controller';
     protected const SEGMENT_TYPE_PROCESS = 'process';
-    protected const SEGMENT_TYPE_TEMPLATE = 'template';
+    protected const SEGMENT_TYPE_TEMPLATE = 'view';
 
     /**
      * @var string[]

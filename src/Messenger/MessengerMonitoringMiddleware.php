@@ -70,7 +70,7 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
         if (!$this->inspector->hasTransaction()) {
             $this->inspector->startTransaction($class)->setType('message');
         } elseif ($this->inspector->canAddSegments()) {
-            $this->segment = $this->inspector->startSegment('message', $class);
+            $this->segment = $this->inspector->startSegment('job.message', $class);
         }
     }
 
