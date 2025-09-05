@@ -310,8 +310,10 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $controllerLabel = $event->getRequest()->attributes->get('_controller');
 
-        if ($controllerLabel) {
+        if (is_string($controllerLabel)) {
             $this->endSegment($controllerLabel);
+        } elseif (is_array($controllerLabel)) {
+            $this->endSegment(implode('::', $controllerLabel));
         }
 
         $this->startSegment(self::SEGMENT_TYPE_TEMPLATE, KernelEvents::VIEW);
