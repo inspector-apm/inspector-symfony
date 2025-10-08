@@ -300,6 +300,10 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         if ($this->inspector->hasTransaction()){
             $this->inspector->transaction()->setResult($event->getResponse()->getStatusCode());
         }
+
+        // Flush data immediately to support long-running processes (FrankenPHP, Swoole, etc.)
+        // where PHP's shutdown functions are not called between requests
+        $this->inspector->flush();
     }
 
     public function onKernelView(ViewEvent $event): void

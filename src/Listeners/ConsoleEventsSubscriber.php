@@ -113,6 +113,10 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
                 'options' => $event->getInput()->getOptions(),
             ]);
         }
+
+        // Flush data immediately to support long-running processes (FrankenPHP, Swoole, etc.)
+        // where PHP's shutdown functions are not called between commands
+        $this->inspector->flush();
     }
 
     public function onConsoleSignal(ConsoleSignalEvent $event): void
@@ -126,6 +130,10 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
         if ($this->inspector->canAddSegments()) {
             $this->inspector->transaction()->setResult('terminated');
         }
+
+        // Flush data immediately to support long-running processes (FrankenPHP, Swoole, etc.)
+        // where PHP's shutdown functions are not called between commands
+        $this->inspector->flush();
     }
 
     protected function isIgnored(string $command): bool
