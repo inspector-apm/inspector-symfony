@@ -14,4 +14,4 @@ docs/*.pyc
 .phpunit.result.cache
 /tests/cache
 /tests/cache*
-
+CLAUDE.md
