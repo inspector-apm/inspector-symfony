@@ -13,6 +13,7 @@ Code Execution Monitoring for Symfony applications.
 - [Install](#install)
 - [Configure the INGESTION key](#key)
 - [Test & Deploy](#deploy)
+- [AI Assisted Integration](#agentic)
 - [Official Documentation](https://docs.inspector.dev/symfony)
 
 <a name="requirements"></a>
@@ -60,6 +61,17 @@ Inspector monitors many components by default:
 - Background Messenger processing
 
 But you have several configuration parameters to customize its behavior. Check out the official documentation below.
+
+<a name="agentic"></a>
+
+## Agentic Integration
+
+You can connect the Inspector library documentation to your coding assistant as a Model Context Protocol (MCP) server.
+
+It makes it easy for tools like Claude Code, Cursor, and VS Code extensions reliably understand what Inspector
+client library can do, its configurations, how to use it.
+
+[AI Assisted Integration](https://docs.inspector.dev/concepts/agentic-integration)
 
 ## Official documentation
 
