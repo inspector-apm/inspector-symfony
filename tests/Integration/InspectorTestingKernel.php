@@ -9,6 +9,9 @@ use Inspector\Symfony\Bundle\InspectorBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -59,6 +62,25 @@ class InspectorTestingKernel extends Kernel
         } elseif (is_file($path = dirname(__DIR__).'/config/services.php')) {
             (require $path)($container->withPath($path), $this);
         }
+    }
+
+    protected function build(ContainerBuilder $container): void
+    {
+        parent::build($container);
+
+        // Fix messenger.receiver_locator having no class when no receivers
+        // are registered (e.g. in test environment with minimal config)
+        $container->addCompilerPass(new class implements CompilerPassInterface {
+            public function process(ContainerBuilder $container): void
+            {
+                if ($container->hasDefinition('messenger.receiver_locator')) {
+                    $definition = $container->getDefinition('messenger.receiver_locator');
+                    if (!$definition->getClass() && !$definition->isSynthetic()) {
+                        $definition->setSynthetic(true);
+                    }
+                }
+            }
+        }, PassConfig::TYPE_BEFORE_OPTIMIZATION, -255);
     }
 
     //
