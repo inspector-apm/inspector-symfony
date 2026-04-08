@@ -9,20 +9,29 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class IntegrationTest extends KernelTestCase
 {
-    public function testServiceWiring()
+    private static function getInspectorService(): Inspector
     {
         self::bootKernel(['environment' => 'test']);
 
-        $inspectorService = static::getContainer()->get(Inspector::class);
+        // static::getContainer() was added in Symfony 5.3; fall back to
+        // the deprecated self::$container for older versions.
+        if (method_exists(static::class, 'getContainer')) {
+            return static::getContainer()->get(Inspector::class);
+        }
+
+        return self::$container->get(Inspector::class);
+    }
+
+    public function testServiceWiring()
+    {
+        $inspectorService = self::getInspectorService();
 
         $this->assertInstanceOf(Inspector::class, $inspectorService);
     }
 
     public function testServiceWiringWithConfiguration()
     {
-        self::bootKernel(['environment' => 'test']);
-
-        $inspectorService = static::getContainer()->get(Inspector::class);
+        $inspectorService = self::getInspectorService();
 
         $this->assertFalse($inspectorService->hasTransaction());
     }
