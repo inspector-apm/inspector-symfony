@@ -20,8 +20,8 @@ Code Execution Monitoring for Symfony applications.
 
 ## Requirements
 
-- PHP >= 7.2
-- Symfony ^5.2|^6.0|^7.0
+- PHP >= 8.1
+- Symfony ^6.0|^7.0|^8.0
 
 <a name="install"></a>
 
