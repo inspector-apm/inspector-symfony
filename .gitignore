@@ -17,3 +17,4 @@ docs/*.pyc
 .claude
 .ai
 /**/CLAUDE.md
+.php*.cache
