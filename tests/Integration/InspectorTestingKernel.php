@@ -68,14 +68,16 @@ class InspectorTestingKernel extends Kernel
     {
         parent::build($container);
 
-        // Fix messenger.receiver_locator having no class when no receivers
-        // are registered (e.g. in test environment with minimal config)
+        // Fix messenger service locators having no class when transports
+        // don't create actual receivers (e.g. in test environment)
         $container->addCompilerPass(new class implements CompilerPassInterface {
             public function process(ContainerBuilder $container): void
             {
-                if ($container->hasDefinition('messenger.receiver_locator')) {
-                    $definition = $container->getDefinition('messenger.receiver_locator');
-                    if (!$definition->getClass() && !$definition->isSynthetic()) {
+                foreach ($container->getDefinitions() as $id => $definition) {
+                    if (str_starts_with($id, 'messenger.')
+                        && !$definition->getClass()
+                        && !$definition->isSynthetic()
+                        && !$definition->isAbstract()) {
                         $definition->setSynthetic(true);
                     }
                 }
