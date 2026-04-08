@@ -23,6 +23,7 @@ class Configuration implements ConfigurationInterface
             ->booleanNode('messenger')->defaultTrue()->end()
             ->booleanNode('query')->defaultTrue()->end()
             ->booleanNode('query_bindings')->defaultTrue()->end()
+            ->booleanNode('http_client')->defaultTrue()->end()
             ->booleanNode('templates')->defaultTrue()->end()
             ->booleanNode('user')->defaultTrue()->end()
             ->scalarNode('transport')->defaultValue('async')->end()

@@ -26,6 +26,7 @@
         "doctrine/doctrine-bundle": "^2.4|^3.0",
         "phpunit/phpunit": "^9.5",
         "symfony/doctrine-messenger": "^5.2|^6.0|^7.0|^8.0",
+        "symfony/http-client": "^6.4 || ^7.0 || ^8.0",
         "symfony/mailer": "^5.2|^6.0|^7.0|^8.0",
         "symfony/notifier": "^5.2|^6.0|^7.0|^8.0",
         "symfony/security-bundle": "^5.2|^6.0|^7.0|^8.0",
@@ -41,6 +42,11 @@
         "psr-4": {
             "Inspector\\Symfony\\Bundle\\Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "test": [
+            "vendor/bin/phpunit --colors=always"
+        ]
     },
 	"minimum-stability": "dev",
     "prefer-stable": true
