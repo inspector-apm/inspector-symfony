@@ -1,3 +1,6 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
     test: true
+
+parameters:
+    env(MESSENGER_TRANSPORT_DSN): 'sync://'
