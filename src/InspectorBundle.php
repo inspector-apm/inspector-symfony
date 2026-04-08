@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle;
 
 use Inspector\Symfony\Bundle\DependencyInjection\Compiler\DoctrineDBALCompilerPass;

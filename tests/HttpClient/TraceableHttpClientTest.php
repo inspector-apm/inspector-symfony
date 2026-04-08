@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\Tests\HttpClient;
 
 use Inspector\Inspector;
@@ -11,6 +13,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
+
+use function count;
+use function interface_exists;
 
 class TraceableHttpClientTest extends TestCase
 {

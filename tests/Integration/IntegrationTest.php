@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\Tests\Integration;
 
 use Inspector\Inspector;
@@ -25,4 +27,3 @@ class IntegrationTest extends KernelTestCase
         $this->assertFalse($inspectorService->hasTransaction());
     }
 }
-

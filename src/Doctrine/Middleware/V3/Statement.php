@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\Doctrine\Middleware\V3;
 
 use Doctrine\DBAL\Driver\Middleware\AbstractStatementMiddleware;
@@ -7,6 +9,9 @@ use Doctrine\DBAL\Driver\Result as ResultInterface;
 use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\ParameterType;
 use Inspector\Symfony\Bundle\Doctrine\Middleware\InspectorSQLSegmentTracer;
+
+use function array_slice;
+use function func_get_args;
 
 /**
  * Statement class for Doctrine DBAL3
@@ -33,7 +38,7 @@ class Statement extends AbstractStatementMiddleware
 
     public function bindParam($param, &$variable, $type = ParameterType::STRING, $length = null): bool
     {
-        return parent::bindParam($param, $variable, $type, ...\array_slice(\func_get_args(), 3));
+        return parent::bindParam($param, $variable, $type, ...array_slice(func_get_args(), 3));
     }
 
     public function bindValue($param, $value, $type = ParameterType::STRING): void

@@ -1,15 +1,14 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Inspector\Symfony\Bundle\DependencyInjection;
 
 use Inspector\Inspector;
 use Inspector\Symfony\Bundle\Messenger\MessengerMonitoringMiddleware;
-use Inspector\Symfony\Bundle\NeuronAI\AgentMonitoring;
 use Inspector\Symfony\Bundle\Twig\TwigTracer;
 use Inspector\Symfony\Bundle\Listeners\ConsoleEventsSubscriber;
 use Inspector\Symfony\Bundle\Listeners\KernelEventsSubscriber;
-use NeuronAI\AgentInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -20,13 +19,19 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Security;
+use Exception;
+use InvalidArgumentException;
+use ReturnTypeWillChange;
+
+use function class_exists;
+use function interface_exists;
 
 class InspectorExtension extends Extension implements PrependExtensionInterface
 {
     /**
      * Current version of the bundle.
      */
-    const VERSION = '1.8.2';
+    public const VERSION = '1.8.2';
 
     public function prepend(ContainerBuilder $container): void
     {
@@ -52,9 +57,9 @@ class InspectorExtension extends Extension implements PrependExtensionInterface
     /**
      * Loads a specific configuration.
      *
-     * @throws \InvalidArgumentException|\Exception When provided tag is not defined in this extension
+     * @throws InvalidArgumentException|Exception When provided tag is not defined in this extension
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = $this->getConfiguration($configs, $container);

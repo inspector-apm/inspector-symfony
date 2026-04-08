@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\Listeners;
 
 use Inspector\Inspector;
@@ -10,6 +12,10 @@ use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleSignalEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Exception;
+
+use function array_key_exists;
+use function defined;
 
 class ConsoleEventsSubscriber implements EventSubscriberInterface
 {
@@ -58,7 +64,7 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
     /**
      * Intercept a command execution.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function onConsoleStart(ConsoleCommandEvent $event): void
     {
@@ -83,7 +89,7 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
     /**
      * Handle a console error.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function onConsoleError(ConsoleErrorEvent $event): void
     {
@@ -104,9 +110,9 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if($this->inspector->hasTransaction() && $this->inspector->transaction()->name === $commandName) {
+        if ($this->inspector->hasTransaction() && $this->inspector->transaction()->name === $commandName) {
             $this->inspector->transaction()->setResult($event->getExitCode() === 0 ? 'success' : 'error');
-        } elseif(\array_key_exists($commandName, $this->segments)) {
+        } elseif (array_key_exists($commandName, $this->segments)) {
             $this->segments[$commandName]->end()->addContext('Command', [
                 'exit_code' => $event->getExitCode(),
                 'arguments' => $event->getInput()->getArguments(),

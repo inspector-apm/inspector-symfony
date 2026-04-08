@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\Messenger;
 
 use Inspector\Inspector;
@@ -13,6 +15,12 @@ use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Exception;
+use Throwable;
+
+use function get_class;
+use function is_array;
+use function method_exists;
 
 class MessengerMonitoringMiddleware implements MiddlewareInterface
 {
@@ -49,7 +57,7 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
             $this->afterHandle($envelope->all(HandledStamp::class));
 
             return $envelope;
-        } catch (\Throwable $error) {
+        } catch (Throwable $error) {
             $this->errorHandle($error);
             throw $error;
         } finally {
@@ -63,7 +71,7 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function beforeHandle($class): void
     {
@@ -91,17 +99,17 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
         }
     }
 
-    protected function errorHandle(\Throwable $exception): void
+    protected function errorHandle(Throwable $exception): void
     {
         if ($exception instanceof WrappedExceptionsInterface) {
             $exception = $exception->getWrappedExceptions();
-        } elseif ($exception instanceof HandlerFailedException && \method_exists($exception, 'getNestedExceptions')) {
+        } elseif ($exception instanceof HandlerFailedException && method_exists($exception, 'getNestedExceptions')) {
             $exception = $exception->getNestedExceptions();
-        } elseif ($exception instanceof DelayedMessageHandlingException && \method_exists($exception, 'getExceptions')) {
+        } elseif ($exception instanceof DelayedMessageHandlingException && method_exists($exception, 'getExceptions')) {
             $exception = $exception->getExceptions();
         }
 
-        if (\is_array($exception)) {
+        if (is_array($exception)) {
             foreach ($exception as $nestedException) {
                 $this->errorHandle($nestedException);
             }

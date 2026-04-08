@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\Doctrine\V2;
 
 use Doctrine\DBAL\Logging\SQLLogger;

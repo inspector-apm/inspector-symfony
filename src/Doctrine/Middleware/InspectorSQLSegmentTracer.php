@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\Doctrine\Middleware;
 
 use Doctrine\DBAL\Types\Type;
 use Inspector\Inspector;
+use LogicException;
 
 class InspectorSQLSegmentTracer
 {
@@ -64,7 +67,7 @@ class InspectorSQLSegmentTracer
         }
 
         if (null === $this->segment) {
-            throw new \LogicException('Attempt to stop a segment that has not been started');
+            throw new LogicException('Attempt to stop a segment that has not been started');
         }
 
         $this->segment->end();

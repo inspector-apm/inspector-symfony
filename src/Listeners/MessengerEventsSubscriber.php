@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Inspector\Symfony\Bundle\Listeners;
 
@@ -12,6 +13,10 @@ use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\TransportInterface;
+use Exception;
+
+use function array_key_exists;
+use function get_class;
 
 class MessengerEventsSubscriber implements EventSubscriberInterface
 {
@@ -55,7 +60,7 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$this->inspector->hasTransaction() ) {
+        if (!$this->inspector->hasTransaction()) {
             $this->inspector->startTransaction($class)->setType('message');
         } elseif ($this->inspector->canAddSegments()) {
             $this->segments[$class] = $this->inspector->startSegment('job.message', $class);
@@ -66,7 +71,7 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
      * Handle worker fail.
      *
      * @param WorkerMessageFailedEvent $event
-     * @throws \Exception
+     * @throws Exception
      */
     public function onWorkerMessageFailed(WorkerMessageFailedEvent $event)
     {
@@ -78,7 +83,7 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
 
         $this->inspector->reportException($event->getThrowable());
 
-        if (\array_key_exists($class, $this->segments)) {
+        if (array_key_exists($class, $this->segments)) {
             $this->segments[$class]->end();
         }
 
@@ -93,7 +98,7 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
      * MessageHandled.
      *
      * @param WorkerMessageHandledEvent $event
-     * @throws \Exception
+     * @throws Exception
      */
     public function onWorkerMessageHandled(WorkerMessageHandledEvent $event)
     {
@@ -111,7 +116,7 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
             $handlers[] = $handlerStamp->getHandlerName();
         }
 
-        if (\array_key_exists($class, $this->segments)) {
+        if (array_key_exists($class, $this->segments)) {
             $this->segments[$class]
                 ->addContext('Handlers', $handlers)
                 ->end();

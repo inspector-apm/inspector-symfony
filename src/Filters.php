@@ -1,6 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle;
+
+use function preg_match;
+use function preg_quote;
+use function str_replace;
 
 class Filters
 {

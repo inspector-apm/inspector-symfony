@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\Tests\DependencyInjection\Compiler;
 
 use Inspector\Inspector;
@@ -9,6 +11,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use stdClass;
+
+use function array_merge;
+use function interface_exists;
 
 class HttpClientCompilerPassTest extends TestCase
 {
@@ -41,7 +47,7 @@ class HttpClientCompilerPassTest extends TestCase
     public function testDecoratesDefaultHttpClient(): void
     {
         $this->setConfig([]);
-        $this->container->setDefinition('http_client', new Definition(\stdClass::class));
+        $this->container->setDefinition('http_client', new Definition(stdClass::class));
 
         (new HttpClientCompilerPass())->process($this->container);
 
@@ -56,9 +62,9 @@ class HttpClientCompilerPassTest extends TestCase
     {
         $this->setConfig([]);
 
-        $this->container->setDefinition('http_client', new Definition(\stdClass::class));
+        $this->container->setDefinition('http_client', new Definition(stdClass::class));
 
-        $scopedClient = new Definition(\stdClass::class);
+        $scopedClient = new Definition(stdClass::class);
         $scopedClient->addTag('http_client.client');
         $this->container->setDefinition('acme.api_client', $scopedClient);
 
@@ -71,7 +77,7 @@ class HttpClientCompilerPassTest extends TestCase
     public function testSkipsWhenDisabled(): void
     {
         $this->setConfig(['enabled' => false]);
-        $this->container->setDefinition('http_client', new Definition(\stdClass::class));
+        $this->container->setDefinition('http_client', new Definition(stdClass::class));
 
         (new HttpClientCompilerPass())->process($this->container);
 
@@ -81,7 +87,7 @@ class HttpClientCompilerPassTest extends TestCase
     public function testSkipsWhenHttpClientConfigIsFalse(): void
     {
         $this->setConfig(['http_client' => false]);
-        $this->container->setDefinition('http_client', new Definition(\stdClass::class));
+        $this->container->setDefinition('http_client', new Definition(stdClass::class));
 
         (new HttpClientCompilerPass())->process($this->container);
 
@@ -91,7 +97,7 @@ class HttpClientCompilerPassTest extends TestCase
     public function testSkipsWhenIngestionKeyIsEmpty(): void
     {
         $this->setConfig(['ingestion_key' => null]);
-        $this->container->setDefinition('http_client', new Definition(\stdClass::class));
+        $this->container->setDefinition('http_client', new Definition(stdClass::class));
 
         (new HttpClientCompilerPass())->process($this->container);
 
@@ -110,7 +116,7 @@ class HttpClientCompilerPassTest extends TestCase
     public function testDecoratorReferencesInspector(): void
     {
         $this->setConfig([]);
-        $this->container->setDefinition('http_client', new Definition(\stdClass::class));
+        $this->container->setDefinition('http_client', new Definition(stdClass::class));
 
         (new HttpClientCompilerPass())->process($this->container);
 
@@ -125,7 +131,7 @@ class HttpClientCompilerPassTest extends TestCase
     public function testDecoratorIsNotPublic(): void
     {
         $this->setConfig([]);
-        $this->container->setDefinition('http_client', new Definition(\stdClass::class));
+        $this->container->setDefinition('http_client', new Definition(stdClass::class));
 
         (new HttpClientCompilerPass())->process($this->container);
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\Tests\Integration;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
@@ -9,6 +11,9 @@ use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Kernel;
+
+use function dirname;
+use function is_file;
 
 /**
  * Class InspectorTestingKernel
@@ -48,24 +53,24 @@ class InspectorTestingKernel extends Kernel
         $container->import('../config/{packages}/*.yaml');
         $container->import('../config/{packages}/'.$this->environment.'/*.yaml');
 
-        if (is_file(\dirname(__DIR__).'/config/services.yaml')) {
+        if (is_file(dirname(__DIR__).'/config/services.yaml')) {
             $container->import('../config/services.yaml');
             $container->import('../config/{services}_'.$this->environment.'.yaml');
-        } elseif (is_file($path = \dirname(__DIR__).'/config/services.php')) {
+        } elseif (is_file($path = dirname(__DIR__).'/config/services.php')) {
             (require $path)($container->withPath($path), $this);
         }
     }
 
-//
-//    /**
-//     * @inheritDoc
-//     */
-//    public function registerContainerConfiguration(LoaderInterface $loader)
-//    {
-//        $loader->load(
-//            function (ContainerBuilder $container) {
-//                $container->loadFromExtension('inspector', $this->inspectorConfig);
-//            }
-//        );
-//    }
+    //
+    //    /**
+    //     * @inheritDoc
+    //     */
+    //    public function registerContainerConfiguration(LoaderInterface $loader)
+    //    {
+    //        $loader->load(
+    //            function (ContainerBuilder $container) {
+    //                $container->loadFromExtension('inspector', $this->inspectorConfig);
+    //            }
+    //        );
+    //    }
 }

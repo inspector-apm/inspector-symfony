@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\Tests\HttpClient;
 
 use Inspector\Models\Segment;
@@ -8,6 +10,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Throwable;
+
+use function interface_exists;
 
 class TraceableResponseTest extends TestCase
 {
@@ -42,7 +47,7 @@ class TraceableResponseTest extends TestCase
         // by consuming the response (which ends the segment)
         try {
             $this->traceableResponse->getInfo();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // ignore if already destroyed
         }
     }

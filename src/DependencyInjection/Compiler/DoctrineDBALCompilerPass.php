@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\DependencyInjection\Compiler;
 
 /** Compatibility with doctrine/dbal < 2.10.0 */
@@ -15,6 +17,12 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use ReturnTypeWillChange;
+
+use function class_exists;
+use function count;
+use function method_exists;
+use function sprintf;
 
 /** End compatibility with doctrine/dbal < 2.10.0 */
 class DoctrineDBALCompilerPass implements CompilerPassInterface
@@ -22,7 +30,7 @@ class DoctrineDBALCompilerPass implements CompilerPassInterface
     /**
      * You can modify the container here before it is dumped to PHP code.
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function process(ContainerBuilder $container): void
     {
         $config = $container->getParameter('inspector.configuration.definition');

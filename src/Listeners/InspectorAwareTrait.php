@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Inspector\Symfony\Bundle\Listeners;
 
 use Inspector\Inspector;
 use Inspector\Models\Segment;
 use Inspector\Models\Transaction;
-use Throwable;
+use Exception;
 
 trait InspectorAwareTrait
 {
@@ -23,7 +24,7 @@ trait InspectorAwareTrait
     /**
      * Be sure to start a transaction before report the exception.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function startTransaction(string $name): ?Transaction
     {

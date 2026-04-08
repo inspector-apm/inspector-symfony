@@ -10,6 +10,8 @@ use Twig\Extension\AbstractExtension;
 use Twig\Profiler\NodeVisitor\ProfilerNodeVisitor;
 use Twig\Profiler\Profile;
 
+use function sprintf;
+
 final class TwigTracer extends AbstractExtension
 {
     /**

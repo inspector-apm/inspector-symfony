@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\DependencyInjection\Compiler;
 
 use Inspector\Inspector;
@@ -8,10 +10,13 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use ReturnTypeWillChange;
+
+use function interface_exists;
 
 class HttpClientCompilerPass implements CompilerPassInterface
 {
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function process(ContainerBuilder $container): void
     {
         $config = $container->getParameter('inspector.configuration.definition');

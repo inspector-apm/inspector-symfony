@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\HttpClient;
 
 use Inspector\Models\Segment;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+
+use function strlen;
 
 class TraceableResponse implements ResponseInterface
 {

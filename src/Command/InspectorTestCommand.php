@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\Command;
 
 use Inspector\Inspector;
@@ -10,6 +12,13 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Exception;
+use Throwable;
+
+use function function_exists;
+use function proc_open;
+use function sleep;
+use function usleep;
 
 class InspectorTestCommand extends Command
 {
@@ -74,7 +83,7 @@ class InspectorTestCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -91,7 +100,7 @@ class InspectorTestCommand extends Command
         // Test proc_open function availability
         try {
             proc_open("", [], $pipes);
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             $io->warning("❌ proc_open function disabled.");
 
             return Command::FAILURE;
@@ -134,7 +143,7 @@ class InspectorTestCommand extends Command
         }, 'doctrine:default', "SELECT name, (SELECT COUNT(*) FROM orders WHERE user_id = users.id) AS order_count FROM users");
 
         // Report Exception
-        $this->inspector->reportException(new \Exception('First Exception detected'));
+        $this->inspector->reportException(new Exception('First Exception detected'));
 
         // End the transaction
         $this->inspector->transaction()

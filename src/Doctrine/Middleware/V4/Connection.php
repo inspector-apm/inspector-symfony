@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\Doctrine\Middleware\V4;
 
 use Doctrine\DBAL\Driver\Connection as ConnectionInterface;

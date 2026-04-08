@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\Listeners;
 
 use Inspector\Inspector;
@@ -20,6 +22,18 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Security;
+use Exception;
+use LogicException;
+use Throwable;
+
+use function get_class;
+use function implode;
+use function is_array;
+use function is_null;
+use function is_object;
+use function is_string;
+use function method_exists;
+use function trim;
 
 /**
  * @todo: use trait for compatibility isMaster/isMain
@@ -118,7 +132,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         $this->endSegment(KernelEvents::REQUEST);
 
         $this->startSegment(self::SEGMENT_TYPE_CONTROLLER, KernelEvents::CONTROLLER)
-            ->addContext("Controller",['class' => $event->getController()]);
+            ->addContext("Controller", ['class' => $event->getController()]);
     }
 
     public function onKernelPreControllerArguments(ControllerArgumentsEvent $event): void
@@ -145,9 +159,9 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $arguments = [];
         foreach ($event->getArguments() as $argument) {
-            if (\is_object($argument)) {
-                $args = ['class' => \get_class($argument)];
-                if (\method_exists($argument, 'getId')) {
+            if (is_object($argument)) {
+                $args = ['class' => get_class($argument)];
+                if (method_exists($argument, 'getId')) {
                     $args['id'] = $argument->getId();
                 }
                 $arguments[] = $args;
@@ -163,7 +177,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     /**
      * Intercept an HTTP request.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function onKernelRequest(RequestEvent $event): void
     {
@@ -185,7 +199,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
                 $this->routePath = $request->getPathInfo();
             }
 
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             $this->routePath = $request->getPathInfo();
         }
 
@@ -193,7 +207,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->startTransaction($event->getRequest()->getMethod() . ' /' . \trim($this->routePath, '/'))
+        $this->startTransaction($event->getRequest()->getMethod() . ' /' . trim($this->routePath, '/'))
             ->markAsRequest();
 
         $this->startSegment(self::SEGMENT_TYPE_PROCESS, KernelEvents::REQUEST);
@@ -272,7 +286,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      *
      * @param GetResponseForExceptionEvent|ExceptionEvent $event
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function onKernelException($event): void
     {
@@ -284,12 +298,12 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         // The additional `method_exists` check is to prevent errors in Symfony 4.3
         // where the ExceptionEvent exists and is used but doesn't implement
         // the `getThrowable` method, which was introduced in Symfony 4.4
-        if ($event instanceof ExceptionEvent && \method_exists($event, 'getThrowable')) {
+        if ($event instanceof ExceptionEvent && method_exists($event, 'getThrowable')) {
             $exception = $event->getThrowable();
         } elseif ($event instanceof GetResponseForExceptionEvent) {
             $exception = $event->getException();
         } else {
-            throw new \LogicException('Invalid exception event.');
+            throw new LogicException('Invalid exception event.');
         }
 
         $this->inspector->reportException($exception, false);
@@ -297,7 +311,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelTerminate(TerminateEvent $event): void
     {
-        if ($this->inspector->hasTransaction()){
+        if ($this->inspector->hasTransaction()) {
             $this->inspector->transaction()->setResult($event->getResponse()->getStatusCode());
         }
 
@@ -308,7 +322,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
     public function onKernelView(ViewEvent $event): void
     {
-        if (!$this->inspector->canAddSegments() || $this->isMasterMainRequest($event)){
+        if (!$this->inspector->canAddSegments() || $this->isMasterMainRequest($event)) {
             return;
         }
 

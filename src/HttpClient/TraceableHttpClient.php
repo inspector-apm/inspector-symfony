@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Inspector\Symfony\Bundle\HttpClient;
 
 use Inspector\Inspector;
@@ -7,6 +9,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 use Symfony\Contracts\Service\ResetInterface;
+
+use function parse_url;
 
 class TraceableHttpClient implements HttpClientInterface, ResetInterface
 {
