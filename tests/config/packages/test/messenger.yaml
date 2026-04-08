@@ -1,3 +1,5 @@
 framework:
     messenger:
-        enabled: false
+        transports:
+            async: 'sync://'
+            failed: 'sync://'
