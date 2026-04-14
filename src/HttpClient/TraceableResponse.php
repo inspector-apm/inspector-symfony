@@ -11,18 +11,14 @@ use function strlen;
 
 class TraceableResponse implements ResponseInterface
 {
-    private ResponseInterface $response;
-    private Segment $segment;
-    private string $method;
-    private string $url;
-    private bool $segmentEnded = false;
+    protected bool $segmentEnded = false;
 
-    public function __construct(ResponseInterface $response, Segment $segment, string $method, string $url)
-    {
-        $this->response = $response;
-        $this->segment = $segment;
-        $this->method = $method;
-        $this->url = $url;
+    public function __construct(
+        protected ResponseInterface $response,
+        protected Segment $segment,
+        protected string $method,
+        protected string $url
+    ){
     }
 
     public function getStatusCode(): int
