@@ -97,7 +97,7 @@ class InspectorExtension extends Extension implements PrependExtensionInterface
                 new Reference(RouterInterface::class),
                 new Reference(Security::class),
                 null,
-                $config['ignore_routes']
+                $config['ignore_routes'],
             ]);
         } elseif (class_exists(TokenStorageInterface::class)) {
             // Symfony Security Bundle >= 7
@@ -106,7 +106,7 @@ class InspectorExtension extends Extension implements PrependExtensionInterface
                 new Reference(RouterInterface::class),
                 null,
                 new Reference(TokenStorageInterface::class),
-                $config['ignore_routes']
+                $config['ignore_routes'],
             ]);
         } else {
             // No Symfony Security Bundle
@@ -115,7 +115,7 @@ class InspectorExtension extends Extension implements PrependExtensionInterface
                 new Reference(RouterInterface::class),
                 null,
                 null,
-                $config['ignore_routes']
+                $config['ignore_routes'],
             ]);
         }
         $kernelEventsSubscriberDefinition->setPublic(false)->addTag('kernel.event_subscriber');
@@ -147,7 +147,7 @@ class InspectorExtension extends Extension implements PrependExtensionInterface
         if (interface_exists(\Symfony\Component\Messenger\MessageBusInterface::class) && true === $config['messenger']) {
             $messengerMiddleware = new Definition(MessengerMonitoringMiddleware::class, [
                 new Reference(Inspector::class),
-                $config['ignore_messages'] ?? []
+                $config['ignore_messages'] ?? [],
             ]);
 
             /*$messengerMiddleware->addTag('messenger.middleware', [

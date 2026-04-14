@@ -112,7 +112,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
             KernelEvents::CONTROLLER => ['onKernelController', 9999],
             KernelEvents::CONTROLLER_ARGUMENTS => [
                 ['onKernelPreControllerArguments', 9999],
-                ['onKernelPostControllerArguments', -9999]
+                ['onKernelPostControllerArguments', -9999],
             ],
             KernelEvents::EXCEPTION => ['onKernelException', 9999],
             KernelEvents::FINISH_REQUEST => ['onKernelFinishRequest', 9999],

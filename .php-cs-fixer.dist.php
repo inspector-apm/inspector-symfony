@@ -5,12 +5,13 @@ use PhpCsFixer\Finder;
 
 $finder = Finder::create()
     ->in(__DIR__)
-    ->exclude('vendor');
+    ->exclude(['vendor', 'var']);
 
 return (new Config())
     ->setRules([
         '@PSR12' => true,
         'no_unused_imports' => true,
+        '@PHP8x1Migration' => true,
         'native_function_invocation' => [
             'scope' => 'all',
             'include' => ['@internal', '@compiler_optimized']

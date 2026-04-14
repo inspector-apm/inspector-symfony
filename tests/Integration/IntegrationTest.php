@@ -7,6 +7,8 @@ namespace Inspector\Symfony\Bundle\Tests\Integration;
 use Inspector\Inspector;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
+use function method_exists;
+
 class IntegrationTest extends KernelTestCase
 {
     private static function getInspectorService(): Inspector

@@ -18,7 +18,7 @@ class TraceableResponse implements ResponseInterface
         protected Segment $segment,
         protected string $method,
         protected string $url
-    ){
+    ) {
     }
 
     public function getStatusCode(): int
