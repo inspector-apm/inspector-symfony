@@ -312,7 +312,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
     public function onKernelTerminate(TerminateEvent $event): void
     {
         if ($this->inspector->hasTransaction()) {
-            $this->inspector->transaction()->setResult($event->getResponse()->getStatusCode());
+            $this->inspector->transaction()->setResult((string)$event->getResponse()->getStatusCode());
         }
 
         // Flush data immediately to support long-running processes (FrankenPHP, Swoole, etc.)
