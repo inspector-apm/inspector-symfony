@@ -15,23 +15,17 @@ use function sprintf;
 final class TwigTracer extends AbstractExtension
 {
     /**
-     * @var Inspector
-     */
-    protected $inspector;
-
-    /**
      * @var Segment[]
      */
-    protected $segments = [];
+    protected array $segments = [];
 
     /**
      * TwigTracer constructor.
      *
      * @param Inspector $inspector
      */
-    public function __construct(Inspector $inspector)
+    public function __construct(protected Inspector $inspector)
     {
-        $this->inspector = $inspector;
     }
 
     /**

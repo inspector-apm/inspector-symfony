@@ -16,8 +16,7 @@ use Inspector\Symfony\Bundle\Doctrine\Middleware\InspectorSQLSegmentTracer;
  */
 class Connection extends AbstractConnectionMiddleware
 {
-    /** @var InspectorSQLSegmentTracer */
-    protected $inspectorSQLSegmentTracer;
+    protected InspectorSQLSegmentTracer $inspectorSQLSegmentTracer;
 
     public function __construct(
         ConnectionInterface $connection,

@@ -24,18 +24,12 @@ use function method_exists;
 
 class MessengerMonitoringMiddleware implements MiddlewareInterface
 {
-    protected Inspector $inspector;
-
-    protected array $ignoreMessages;
-
     protected ?Segment $segment = null;
 
     public function __construct(
-        Inspector $inspector,
-        array $ignoreMessages
+        protected Inspector $inspector,
+        protected array $ignoreMessages
     ) {
-        $this->inspector = $inspector;
-        $this->ignoreMessages = $ignoreMessages;
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope

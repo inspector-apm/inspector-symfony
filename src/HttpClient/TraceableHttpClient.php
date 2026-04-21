@@ -14,13 +14,10 @@ use function parse_url;
 
 class TraceableHttpClient implements HttpClientInterface, ResetInterface
 {
-    private HttpClientInterface $client;
-    private Inspector $inspector;
-
-    public function __construct(HttpClientInterface $client, Inspector $inspector)
-    {
-        $this->client = $client;
-        $this->inspector = $inspector;
+    public function __construct(
+        protected HttpClientInterface $client,
+        protected Inspector $inspector
+    ){
     }
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
@@ -63,6 +60,7 @@ class TraceableHttpClient implements HttpClientInterface, ResetInterface
 
     public function withOptions(array $options): static
     {
+        /** @phpstan-ignore-next-line */
         return new static($this->client->withOptions($options), $this->inspector);
     }
 

@@ -10,8 +10,7 @@ use Inspector\Inspector;
 
 class InspectorMiddleware implements MiddlewareInterface
 {
-    /** @var InspectorSQLSegmentTracer */
-    protected $inspectorSQLSegmentTracer;
+    protected InspectorSQLSegmentTracer $inspectorSQLSegmentTracer;
 
     /**
      * InspectorMiddleware constructor.

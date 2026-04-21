@@ -17,8 +17,7 @@ use Inspector\Symfony\Bundle\Doctrine\Middleware\InspectorSQLSegmentTracer;
  */
 class Statement extends AbstractStatementMiddleware
 {
-    /** @var InspectorSQLSegmentTracer */
-    protected $inspectorSQLSegmentTracer;
+    protected InspectorSQLSegmentTracer $inspectorSQLSegmentTracer;
 
     protected string $sql;
 
@@ -32,7 +31,7 @@ class Statement extends AbstractStatementMiddleware
         parent::__construct($statement);
 
         $this->inspectorSQLSegmentTracer = $inspectorSQLSegmentTracer;
-        $this->sql                       = $sql;
+        $this->sql = $sql;
     }
 
     public function bindValue(int|string $param, mixed $value, ParameterType $type): void

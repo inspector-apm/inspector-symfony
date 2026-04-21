@@ -24,32 +24,13 @@ class InspectorTestCommand extends Command
 {
     /**
      * The default command name.
-     *
-     * @var string|null
      */
-    protected static $defaultName = 'inspector:test';
+    protected static string $defaultName = 'inspector:test';
 
     /**
      * The default command description.
-     *
-     * @var string|null
      */
-    protected static $defaultDescription = 'Test the application configuration.';
-
-    /**
-     * @var Inspector
-     */
-    protected $inspector;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var \Inspector\Configuration
-     */
-    protected $configuration;
+    protected static string $defaultDescription = 'Test the application configuration.';
 
     /**
      * InspectorTestCommand constructor.
@@ -58,13 +39,12 @@ class InspectorTestCommand extends Command
      * @param LoggerInterface $logger
      * @param Configuration $configuration
      */
-    public function __construct(Inspector $inspector, LoggerInterface $logger, Configuration $configuration)
-    {
+    public function __construct(
+        protected Inspector $inspector,
+        protected LoggerInterface $logger,
+        protected Configuration $configuration
+    ){
         parent::__construct();
-
-        $this->inspector = $inspector;
-        $this->logger = $logger;
-        $this->configuration = $configuration;
     }
 
     /**

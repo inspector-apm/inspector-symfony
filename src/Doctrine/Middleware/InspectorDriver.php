@@ -15,8 +15,7 @@ use ReflectionMethod;
  */
 class InspectorDriver extends AbstractDriverMiddleware
 {
-    /** @var InspectorSQLSegmentTracer */
-    protected $inspectorSQLSegmentTracer;
+    protected InspectorSQLSegmentTracer $inspectorSQLSegmentTracer;
 
     public function __construct(
         DriverInterface $driver,

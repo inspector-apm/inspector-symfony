@@ -20,22 +20,13 @@ use function get_class;
 
 class MessengerEventsSubscriber implements EventSubscriberInterface
 {
-    protected Inspector $inspector;
-
-    protected array $ignoreMessages;
-
-    private TransportInterface $transport;
-
-    protected $segments = [];
+    protected array $segments = [];
 
     public function __construct(
-        Inspector $inspector,
-        array $ignoreMessages,
-        TransportInterface  $transport
+        protected Inspector $inspector,
+        protected array $ignoreMessages,
+        protected TransportInterface  $transport
     ) {
-        $this->inspector = $inspector;
-        $this->ignoreMessages = $ignoreMessages;
-        $this->transport = $transport;
     }
 
     /**
@@ -52,7 +43,7 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onWorkerMessageReceived(WorkerMessageReceivedEvent $event)
+    public function onWorkerMessageReceived(WorkerMessageReceivedEvent $event): void
     {
         $class = get_class($event->getEnvelope()->getMessage());
 
@@ -70,10 +61,9 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
     /**
      * Handle worker fail.
      *
-     * @param WorkerMessageFailedEvent $event
      * @throws Exception
      */
-    public function onWorkerMessageFailed(WorkerMessageFailedEvent $event)
+    public function onWorkerMessageFailed(WorkerMessageFailedEvent $event): void
     {
         $class = get_class($event->getEnvelope()->getMessage());
 
@@ -97,10 +87,9 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
     /**
      * MessageHandled.
      *
-     * @param WorkerMessageHandledEvent $event
      * @throws Exception
      */
-    public function onWorkerMessageHandled(WorkerMessageHandledEvent $event)
+    public function onWorkerMessageHandled(WorkerMessageHandledEvent $event): void
     {
         $class = get_class($event->getEnvelope()->getMessage());
 

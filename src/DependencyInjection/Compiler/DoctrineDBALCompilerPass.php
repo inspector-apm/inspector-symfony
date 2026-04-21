@@ -88,6 +88,7 @@ class DoctrineDBALCompilerPass implements CompilerPassInterface
 
             // Adding inspectable logger to the Doctrine logger
             $logger = new Reference($loggerDefinitionName);
+            /** @phpstan-ignore-next-line */
             if (!method_exists(SQLParserUtils::class, 'getPositionalPlaceholderPositions') && method_exists(LoggerChain::class, 'addLogger')) {
                 // doctrine/dbal < 2.10.0
                 $chainLogger->addMethodCall('addLogger', [$logger]);

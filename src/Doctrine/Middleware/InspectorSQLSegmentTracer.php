@@ -6,30 +6,18 @@ namespace Inspector\Symfony\Bundle\Doctrine\Middleware;
 
 use Doctrine\DBAL\Types\Type;
 use Inspector\Inspector;
+use Inspector\Models\Segment;
 use LogicException;
 
 class InspectorSQLSegmentTracer
 {
-    /** @var Inspector */
-    protected $inspector;
-
-    /** @var array */
-    protected $configuration;
-
-    /** @var string */
-    protected $connectionName;
-
-    /** @var \Inspector\Models\PerformanceModel|\Inspector\Models\Segment */
-    protected $segment;
+    protected ?Segment $segment = null;
 
     public function __construct(
-        Inspector $inspector,
-        array $configuration,
-        string $connectionName
+        protected Inspector $inspector,
+        protected array $configuration,
+        protected string $connectionName
     ) {
-        $this->inspector = $inspector;
-        $this->configuration = $configuration;
-        $this->connectionName = $connectionName;
     }
 
     /**
@@ -39,7 +27,7 @@ class InspectorSQLSegmentTracer
      * @param array<int, mixed>|array<string, mixed>|null $params Statement parameters
      * @param array<int, Type|int|string|null>|array<string, Type|int|string|null>|null $types Parameter types
      */
-    public function startQuery($sql, ?array $params = null, ?array $types = null): void
+    public function startQuery(string $sql, ?array $params = null, ?array $types = null): void
     {
         if (!$this->inspector->canAddSegments()) {
             return;

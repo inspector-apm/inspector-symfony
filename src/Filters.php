@@ -10,7 +10,7 @@ use function str_replace;
 
 class Filters
 {
-    public static function matchWithWildcard(string $pattern, string $url)
+    public static function matchWithWildcard(string $pattern, string $url): bool
     {
         // Escape special regex characters in the pattern, except for '*'.
         $escapedPattern = preg_quote($pattern, '/');

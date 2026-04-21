@@ -11,15 +11,12 @@ use Exception;
 
 trait InspectorAwareTrait
 {
-    /**
-     * @var Inspector
-     */
-    protected $inspector;
+    protected Inspector $inspector;
 
     /**
      * @var Segment[]
      */
-    protected $segments = [];
+    protected array $segments = [];
 
     /**
      * Be sure to start a transaction before report the exception.

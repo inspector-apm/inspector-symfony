@@ -11,8 +11,7 @@ use Inspector\Symfony\Bundle\Doctrine\Middleware\InspectorSQLSegmentTracer;
 
 class InspectorSQLLogger implements SQLLogger
 {
-    /** @var InspectorSQLSegmentTracer */
-    protected $inspectorSQLSegmentTracer;
+    protected InspectorSQLSegmentTracer $inspectorSQLSegmentTracer;
 
     /**
      * InspectorSQLLogger constructor.
@@ -37,7 +36,7 @@ class InspectorSQLLogger implements SQLLogger
      * @param array<int, mixed>|array<string, mixed>|null $params Statement parameters
      * @param array<int, Type|int|string|null>|array<string, Type|int|string|null>|null $types Parameter types
      */
-    public function startQuery($sql, ?array $params = null, ?array $types = null): void
+    public function startQuery(string $sql, ?array $params = null, ?array $types = null): void
     {
         $this->inspectorSQLSegmentTracer->startQuery($sql, $params, $types);
     }

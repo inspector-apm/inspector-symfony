@@ -20,10 +20,11 @@ use function func_get_args;
  */
 class Statement extends AbstractStatementMiddleware
 {
-    /** @var InspectorSQLSegmentTracer */
-    protected $inspectorSQLSegmentTracer;
+    protected InspectorSQLSegmentTracer $inspectorSQLSegmentTracer;
 
     protected string $sql;
+
+    protected array $params = [];
 
     public function __construct(
         StatementInterface $statement,
@@ -33,25 +34,22 @@ class Statement extends AbstractStatementMiddleware
         parent::__construct($statement);
 
         $this->inspectorSQLSegmentTracer = $inspectorSQLSegmentTracer;
-        $this->sql                       = $sql;
+        $this->sql = $sql;
     }
 
-    public function bindParam($param, &$variable, $type = ParameterType::STRING, $length = null): bool
+    public function bindValue(int|string $param, mixed $value, ParameterType $type): void
     {
-        return parent::bindParam($param, $variable, $type, ...array_slice(func_get_args(), 3));
-    }
+        $this->params[$param] = $value;
 
-    public function bindValue($param, $value, $type = ParameterType::STRING): void
-    {
         parent::bindValue($param, $value, $type);
     }
 
-    public function execute($params = null): ResultInterface
+    public function execute(): ResultInterface
     {
-        $this->inspectorSQLSegmentTracer->startQuery($this->sql, $params);
+        $this->inspectorSQLSegmentTracer->startQuery($this->sql, $this->params);
 
         try {
-            return parent::execute($params);
+            return parent::execute();
         } finally {
             $this->inspectorSQLSegmentTracer->stopQuery();
         }
