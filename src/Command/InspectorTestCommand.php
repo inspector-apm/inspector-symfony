@@ -23,16 +23,6 @@ use function usleep;
 class InspectorTestCommand extends Command
 {
     /**
-     * The default command name.
-     */
-    protected static string $defaultName = 'inspector:test';
-
-    /**
-     * The default command description.
-     */
-    protected static string $defaultDescription = 'Test the application configuration.';
-
-    /**
      * InspectorTestCommand constructor.
      *
      * @param Inspector $inspector
@@ -44,7 +34,7 @@ class InspectorTestCommand extends Command
         protected LoggerInterface $logger,
         protected Configuration $configuration
     ){
-        parent::__construct();
+        parent::__construct('inspector:test');
     }
 
     /**
@@ -52,9 +42,7 @@ class InspectorTestCommand extends Command
      */
     protected function configure(): void
     {
-        $this->setName(self::$defaultName)
-            ->setDescription(self::$defaultDescription)
-        ;
+        $this->setDescription('Test the application configuration.');
     }
 
     /**
