@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 use function dirname;
 use function is_file;
@@ -57,16 +58,8 @@ class InspectorTestingKernel extends Kernel
         }
     }
 
-    //
-    //    /**
-    //     * @inheritDoc
-    //     */
-    //    public function registerContainerConfiguration(LoaderInterface $loader)
-    //    {
-    //        $loader->load(
-    //            function (ContainerBuilder $container) {
-    //                $container->loadFromExtension('inspector', $this->inspectorConfig);
-    //            }
-    //        );
-    //    }
+    protected function configureRoutes(RoutingConfigurator $routes): void
+    {
+        $routes->import('../config/routes.yaml');
+    }
 }

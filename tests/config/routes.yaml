@@ -1,0 +1,7 @@
+test_home:
+    path: /
+    controller: Inspector\Symfony\Bundle\Tests\Fixtures\TestController::index
+
+test_error:
+    path: /error
+    controller: Inspector\Symfony\Bundle\Tests\Fixtures\TestController::error
