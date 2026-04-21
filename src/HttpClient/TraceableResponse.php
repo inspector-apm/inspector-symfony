@@ -13,6 +13,9 @@ class TraceableResponse implements ResponseInterface
 {
     protected bool $segmentEnded = false;
 
+    /** @var array<string, mixed> */
+    private array $context = [];
+
     public function __construct(
         protected ResponseInterface $response,
         protected Segment $segment,
@@ -100,7 +103,7 @@ class TraceableResponse implements ResponseInterface
             return;
         }
 
-        $this->segment->addContext('http', $data);
+        $this->context = array_merge($this->context, $data);
     }
 
     private function endSegment(): void
@@ -110,6 +113,11 @@ class TraceableResponse implements ResponseInterface
         }
 
         $this->segmentEnded = true;
+
+        if (!empty($this->context)) {
+            $this->segment->addContext('http', $this->context);
+        }
+
         $this->segment->end();
     }
 }

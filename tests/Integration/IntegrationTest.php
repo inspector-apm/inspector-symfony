@@ -24,14 +24,14 @@ class IntegrationTest extends KernelTestCase
         return self::$container->get(Inspector::class);
     }
 
-    public function testServiceWiring()
+    public function testServiceWiring(): void
     {
         $inspectorService = self::getInspectorService();
 
         $this->assertInstanceOf(Inspector::class, $inspectorService);
     }
 
-    public function testServiceWiringWithConfiguration()
+    public function testServiceWiringWithConfiguration(): void
     {
         $inspectorService = self::getInspectorService();
 

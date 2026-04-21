@@ -124,7 +124,7 @@ class MessengerEventsSubscriber implements EventSubscriberInterface
      * @param $message
      * @return bool
      */
-    protected function shouldBeMonitored($message): bool
+    protected function shouldBeMonitored(string $message): bool
     {
         foreach ($this->ignoreMessages as $pattern) {
             if (Filters::matchWithWildcard($pattern, $message)) {

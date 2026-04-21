@@ -3,6 +3,9 @@ includes:
 
 parameters:
 
+    bootstrapFiles:
+        - tests/phpstan-stubs.php
+
     type_coverage:
         return: 100
         param: 100
@@ -22,6 +25,12 @@ parameters:
     treatPhpDocTypesAsCertain: false
 
     ignoreErrors:
+        # Version compatibility checks that always evaluate on the installed version
+        - identifier: function.alreadyNarrowedType
+        - identifier: instanceof.alwaysFalse
+        - identifier: booleanAnd.alwaysFalse
+        # Fallback for KernelTestCase::$container removed in Symfony 5.3+
+        - identifier: staticProperty.notFound
 
     excludePaths:
 

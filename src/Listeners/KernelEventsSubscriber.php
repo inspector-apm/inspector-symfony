@@ -255,7 +255,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
      *
      * @throws Exception
      */
-    public function onKernelException($event): void
+    public function onKernelException(ExceptionEvent|GetResponseForExceptionEvent $event): void
     {
         if (!$this->inspector->isRecording()) {
             return;
@@ -304,7 +304,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
         $this->startSegment(self::SEGMENT_TYPE_TEMPLATE, KernelEvents::VIEW);
     }
 
-    protected function isRequestEligibleForInspection($path): bool
+    protected function isRequestEligibleForInspection(string $path): bool
     {
         foreach ($this->ignoredRoutes as $pattern) {
             if (Filters::matchWithWildcard($pattern, $path)) {

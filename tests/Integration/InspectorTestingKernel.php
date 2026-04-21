@@ -23,15 +23,11 @@ class InspectorTestingKernel extends Kernel
 {
     use MicroKernelTrait;
 
-    private $inspectorConfig;
-
     /**
      * @inheritDoc
      */
-    public function __construct(string $environment, bool $debug, array $inspectorConfig = [])
+    public function __construct(string $environment, bool $debug)
     {
-        $this->inspectorConfig = $inspectorConfig;
-
         parent::__construct($environment, $debug);
     }
 

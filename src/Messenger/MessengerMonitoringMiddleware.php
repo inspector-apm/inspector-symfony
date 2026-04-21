@@ -67,7 +67,7 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
     /**
      * @throws Exception
      */
-    protected function beforeHandle($class): void
+    protected function beforeHandle(string $class): void
     {
         if (!$this->inspector->hasTransaction()) {
             $this->inspector->startTransaction($class)->setType('message');
@@ -124,7 +124,7 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
      * @param $class
      * @return bool
      */
-    protected function shouldBeIgnored($class): bool
+    protected function shouldBeIgnored(string $class): bool
     {
         foreach ($this->ignoreMessages as $pattern) {
             if (Filters::matchWithWildcard($pattern, $class)) {

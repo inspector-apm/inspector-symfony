@@ -12,7 +12,7 @@ use Twig\Profiler\Profile;
 
 use function sprintf;
 
-final class TwigTracer extends AbstractExtension
+class TwigTracer extends AbstractExtension
 {
     /**
      * @var Segment[]
