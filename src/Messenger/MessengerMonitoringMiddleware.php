@@ -93,6 +93,9 @@ class MessengerMonitoringMiddleware implements MiddlewareInterface
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function errorHandle(Throwable $exception): void
     {
         if ($exception instanceof WrappedExceptionsInterface) {
