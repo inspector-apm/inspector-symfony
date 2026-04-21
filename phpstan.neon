@@ -31,6 +31,9 @@ parameters:
         - identifier: booleanAnd.alwaysFalse
         # Fallback for KernelTestCase::$container removed in Symfony 5.3+
         - identifier: staticProperty.notFound
+        # DBAL v2 SQLLogger interface lacks type on $sql — cannot add one in PHP 8.5+ implementations
+        - identifier: typeCoverage.paramTypeCoverage
+          path: src/Doctrine/V2/InspectorSQLLogger.php
 
     excludePaths:
 

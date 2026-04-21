@@ -32,11 +32,13 @@ class InspectorSQLLogger implements SQLLogger
     /**
      * Logs a SQL statement.
      *
+     * @phpstan-param string $sql SQL statement
      * @param string $sql SQL statement
      * @param array<int, mixed>|array<string, mixed>|null $params Statement parameters
      * @param array<int, Type|int|string|null>|array<string, Type|int|string|null>|null $types Parameter types
      */
-    public function startQuery(string $sql, ?array $params = null, ?array $types = null): void
+    #[\Override]
+    public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
         $this->inspectorSQLSegmentTracer->startQuery($sql, $params, $types);
     }
