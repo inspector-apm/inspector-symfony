@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
+use Generator;
 
 use function count;
 use function interface_exists;
@@ -110,7 +111,18 @@ class TraceableHttpClientTest extends TestCase
 
         $traceableResponse = $this->traceableClient->request('GET', 'https://example.com/api');
 
+        $chunk = $this->createMock(\Symfony\Contracts\HttpClient\ChunkInterface::class);
+        $generator = (function () use ($innerResponse, $chunk): Generator {
+            yield $innerResponse => $chunk;
+        })();
+
         $stream = $this->createMock(ResponseStreamInterface::class);
+        $stream->method('valid')->willReturnCallback(fn () => $generator->valid());
+        $stream->method('current')->willReturnCallback(fn () => $generator->current());
+        $stream->method('key')->willReturnCallback(fn () => $generator->key());
+        $stream->method('next')->willReturnCallback(fn () => $generator->next());
+        $stream->method('rewind')->willReturnCallback(fn () => $generator->rewind());
+
         $this->innerClient->expects($this->once())->method('stream')
             ->with($this->callback(function (array $responses) use ($innerResponse) {
                 return count($responses) === 1 && $responses[0] === $innerResponse;
@@ -118,7 +130,12 @@ class TraceableHttpClientTest extends TestCase
             ->willReturn($stream);
 
         $result = $this->traceableClient->stream($traceableResponse);
-        $this->assertSame($stream, $result);
+
+        // The stream should yield TraceableResponse as key, not the inner response
+        foreach ($result as $response => $c) {
+            $this->assertSame($traceableResponse, $response);
+            $this->assertSame($chunk, $c);
+        }
     }
 
     public function testStreamPassesRegularResponsesThrough(): void
@@ -132,6 +149,49 @@ class TraceableHttpClientTest extends TestCase
 
         $result = $this->traceableClient->stream([$regularResponse]);
         $this->assertSame($stream, $result);
+    }
+
+    public function testStreamYieldsOriginalTraceableResponseAsKey(): void
+    {
+        $segment = $this->createSegment();
+        $this->inspector->method('canAddSegments')->willReturn(true);
+        $this->inspector->method('startSegment')->willReturn($segment);
+
+        $innerResponse1 = $this->createMock(ResponseInterface::class);
+        $innerResponse2 = $this->createMock(ResponseInterface::class);
+        $this->innerClient->method('request')->willReturnOnConsecutiveCalls($innerResponse1, $innerResponse2);
+
+        $traceable1 = $this->traceableClient->request('GET', 'https://example.com/a');
+        $traceable2 = $this->traceableClient->request('POST', 'https://example.com/b');
+
+        $chunk1 = $this->createMock(\Symfony\Contracts\HttpClient\ChunkInterface::class);
+        $chunk2 = $this->createMock(\Symfony\Contracts\HttpClient\ChunkInterface::class);
+        $generator = (function () use ($innerResponse1, $chunk1, $innerResponse2, $chunk2): Generator {
+            yield $innerResponse1 => $chunk1;
+            yield $innerResponse2 => $chunk2;
+        })();
+
+        $stream = $this->createMock(ResponseStreamInterface::class);
+        $stream->method('valid')->willReturnCallback(fn () => $generator->valid());
+        $stream->method('current')->willReturnCallback(fn () => $generator->current());
+        $stream->method('key')->willReturnCallback(fn () => $generator->key());
+        $stream->method('next')->willReturnCallback(fn () => $generator->next());
+        $stream->method('rewind')->willReturnCallback(fn () => $generator->rewind());
+
+        $this->innerClient->expects($this->once())->method('stream')->willReturn($stream);
+
+        $result = $this->traceableClient->stream([$traceable1, $traceable2]);
+
+        $seen = [];
+        foreach ($result as $response => $chunk) {
+            $seen[] = [$response, $chunk];
+        }
+
+        // Keys must be the original TraceableResponse instances, not inner responses
+        $this->assertSame($traceable1, $seen[0][0]);
+        $this->assertSame($chunk1, $seen[0][1]);
+        $this->assertSame($traceable2, $seen[1][0]);
+        $this->assertSame($chunk2, $seen[1][1]);
     }
 
     public function testWithOptionsReturnsNewInstance(): void

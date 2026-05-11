@@ -10,9 +10,6 @@ use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use Doctrine\DBAL\ParameterType;
 use Inspector\Symfony\Bundle\Doctrine\Middleware\InspectorSQLSegmentTracer;
 
-use function array_slice;
-use function func_get_args;
-
 /**
  * Statement class for Doctrine DBAL3
  *

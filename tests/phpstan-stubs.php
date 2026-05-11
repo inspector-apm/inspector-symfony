@@ -9,6 +9,7 @@ declare(strict_types=1);
  */
 
 // Doctrine DBAL <4 (removed in DBAL 4)
+
 namespace Doctrine\DBAL\Logging;
 
 interface SQLLogger
@@ -18,6 +19,7 @@ interface SQLLogger
 }
 
 // Symfony Security <7 (removed in Symfony 7)
+
 namespace Symfony\Component\Security\Core;
 
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -31,10 +33,8 @@ class Security
 }
 
 // Symfony HttpKernel <5 (removed in Symfony 5)
-namespace Symfony\Component\HttpKernel\Event;
 
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpFoundation\Request;
+namespace Symfony\Component\HttpKernel\Event;
 
 class GetResponseForExceptionEvent extends KernelEvent
 {

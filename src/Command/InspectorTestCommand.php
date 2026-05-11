@@ -33,7 +33,7 @@ class InspectorTestCommand extends Command
         protected Inspector $inspector,
         protected LoggerInterface $logger,
         protected Configuration $configuration
-    ){
+    ) {
         parent::__construct('inspector:test');
     }
 

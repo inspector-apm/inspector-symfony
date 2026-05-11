@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Inspector\Symfony\Bundle\HttpClient;
 
 use Inspector\Inspector;
+use SplObjectStorage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
@@ -17,7 +18,7 @@ class TraceableHttpClient implements HttpClientInterface, ResetInterface
     public function __construct(
         protected HttpClientInterface $client,
         protected Inspector $inspector
-    ){
+    ) {
     }
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
@@ -47,15 +48,25 @@ class TraceableHttpClient implements HttpClientInterface, ResetInterface
         }
 
         $unwrap = [];
+        $wrapMap = new SplObjectStorage();
+
         foreach ($responses as $response) {
             if ($response instanceof TraceableResponse) {
-                $unwrap[] = $response->getInnerResponse();
+                $inner = $response->getInnerResponse();
+                $unwrap[] = $inner;
+                $wrapMap[$inner] = $response;
             } else {
                 $unwrap[] = $response;
             }
         }
 
-        return $this->client->stream($unwrap, $timeout);
+        $stream = $this->client->stream($unwrap, $timeout);
+
+        if ($wrapMap->count() === 0) {
+            return $stream;
+        }
+
+        return new TraceableResponseStream($stream, $wrapMap);
     }
 
     public function withOptions(array $options): static

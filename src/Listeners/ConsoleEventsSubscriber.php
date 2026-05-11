@@ -27,7 +27,7 @@ class ConsoleEventsSubscriber implements EventSubscriberInterface
     public function __construct(
         protected Inspector $inspector,
         protected array $ignoredCommands
-    ){
+    ) {
     }
 
     /**

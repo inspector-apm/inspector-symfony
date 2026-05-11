@@ -8,6 +8,7 @@ use Doctrine\DBAL\Logging\SQLLogger;
 use Doctrine\DBAL\Types\Type;
 use Inspector\Inspector;
 use Inspector\Symfony\Bundle\Doctrine\Middleware\InspectorSQLSegmentTracer;
+use Override;
 
 class InspectorSQLLogger implements SQLLogger
 {
@@ -37,7 +38,7 @@ class InspectorSQLLogger implements SQLLogger
      * @param array<int, mixed>|array<string, mixed>|null $params Statement parameters
      * @param array<int, Type|int|string|null>|array<string, Type|int|string|null>|null $types Parameter types
      */
-    #[\Override]
+    #[Override]
     public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
         $this->inspectorSQLSegmentTracer->startQuery($sql, $params, $types);

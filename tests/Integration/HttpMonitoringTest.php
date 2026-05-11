@@ -7,6 +7,8 @@ namespace Inspector\Symfony\Bundle\Tests\Integration;
 use Inspector\Symfony\Bundle\Listeners\KernelEventsSubscriber;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+use function method_exists;
+
 class HttpMonitoringTest extends WebTestCase
 {
     public function testSubscriberIsRegistered(): void

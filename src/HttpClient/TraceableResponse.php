@@ -8,6 +8,7 @@ use Inspector\Models\Segment;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 use function strlen;
+use function array_merge;
 
 class TraceableResponse implements ResponseInterface
 {
