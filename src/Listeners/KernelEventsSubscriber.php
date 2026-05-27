@@ -26,11 +26,9 @@ use Exception;
 use LogicException;
 use Throwable;
 
-use function get_class;
 use function implode;
 use function is_array;
 use function is_null;
-use function is_object;
 use function is_string;
 use function method_exists;
 use function trim;
@@ -122,23 +120,7 @@ class KernelEventsSubscriber implements EventSubscriberInterface
 
         $this->endSegment(KernelEvents::CONTROLLER_ARGUMENTS);
 
-        $controllerLabel = $this->controllerLabel($event);
-
-        $arguments = [];
-        foreach ($event->getArguments() as $argument) {
-            if (is_object($argument)) {
-                $args = ['class' => get_class($argument)];
-                if (method_exists($argument, 'getId')) {
-                    $args['id'] = $argument->getId();
-                }
-                $arguments[] = $args;
-            } else {
-                $arguments[] = $argument;
-            }
-        }
-
-        $this->startSegment(self::SEGMENT_TYPE_CONTROLLER, $controllerLabel)
-            ->addContext('Data', ['arguments' => $arguments]);
+        $this->startSegment(self::SEGMENT_TYPE_CONTROLLER, $this->controllerLabel($event));
     }
 
     /**
